@@ -1,0 +1,25 @@
+{
+	"moviefile": "3irany02ero.mvi",
+	"statfile": "3irany02ero.txt",
+	"simulation_box": {
+		"SX": 72.0,
+		"SY": 72.0
+	},
+	"pinningsite" : {
+		"pinningsite_R": 1.0,
+		"pinningsite_force": 0.2,
+		"pinning_driving_force": 0.5,
+		"N_pinningsites": 576,
+		"pinning_direction_change": 1
+	},
+	"particle": {
+		"N_particles": 2000,
+		"particle_driving_force": 0.5,
+		"partile_particle_screening_length": 4.0
+	},
+	"dt": 0.001,
+	"statistics_time": 1000,
+	"movei_time": 100,
+	"total_time": 200000,
+	"time_echo": 1000
+}
