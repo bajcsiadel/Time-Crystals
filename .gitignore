@@ -1,5 +1,5 @@
-./results
+results
 *.txt
 *.o
-./build
+build
 *test*
