@@ -1,7 +1,24 @@
+EXE = softsim
+SOURCES = globaldata.c initializer.c running.c jsmn.c main.c
+HEADERS = globaldata.h initializer.h running.h jsmn.h
+
+OUT_DIR = ../build
+RESULT_DIRS = ../results/movies ../results/outs ../results/stats
+
 all: clean bin softsim
-bin: 
-	mkdir -p ../build
-softsim: globaldata.h globaldata.c initializer.h initializer.c running.h running.c main.c
-	gcc globaldata.c initializer.c running.c jsmn.c jsmn.h main.c -o ../build/softsim -lm -ljsmn -L../jsmn
+
+.PHONY: bin
+
+bin: $(OUT_DIR) $(RESULT_DIRS)
+
+$(OUT_DIR):
+	mkdir -p $(OUT_DIR)
+
+$(RESULT_DIRS):
+	mkdir -p $(RESULT_DIRS)
+
+$(EXE): $(SOURCES) $(HEADERS)
+	gcc $^ -o $(OUT_DIR)/$@ -lm -ljsmn -L../jsmn
+
 clean:
-	rm -f ../build/softsim
+	rm -f $(OUT_DIR)/$(EXE)

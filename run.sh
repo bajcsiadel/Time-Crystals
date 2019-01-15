@@ -5,7 +5,7 @@ cd ./source
 make
 cd ../
 
-for param in `ls -a ./parameters | egrep 'n.json$'`
+for param in `ls -a ./parameters | egrep 'ero.json$'`
 do
     NUMBER=`echo $param | tr -dc '0-9'`
     nr=$(($nr+1))

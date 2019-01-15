@@ -15,6 +15,40 @@
 #include "initializer.h"
 #include "globaldata.h"
 
+#ifdef WINDOWS
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else   // LINUX or MAC
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+#endif
+
+void getCurrentWorkingDir(char *current_working_dir) {
+  char buff[FILENAME_MAX];
+  GetCurrentDir( buff, FILENAME_MAX );
+  memcpy(current_working_dir, buff, strlen(buff));
+}
+
+void getPathToResultFolder(char *path, size_t path_size) {
+    char *current_working_dir, *time_crystals;
+
+    current_working_dir = (char *) malloc(255);
+    getCurrentWorkingDir(current_working_dir);
+    time_crystals = strstr(current_working_dir, "Time-Crystals");
+    strncpy(path, "", 1);
+    char *buff, *const end = path + path_size;
+    buff = path;
+    
+    for (; *time_crystals != '\0'; time_crystals++) {
+        if (*time_crystals == '\\' || *time_crystals == '/') {
+            buff += snprintf(buff, end - buff, "%s../", buff);
+        }
+    }
+    
+    snprintf(buff, end - buff, "%sresults/", buff);
+    free(current_working_dir);
+}
+
 //reads the parameter file
 //adjusts the parameters accordingly
 int read_init_file(const char* filename)
@@ -25,7 +59,7 @@ int read_init_file(const char* filename)
     size_t len_tmp, len_json;
 
     n = 3;
-    global.JSON = (char*)malloc(n);
+    global.JSON = (char*) malloc(n);
     len_json = 1;
 	if (f != NULL)
 	{  
@@ -39,14 +73,14 @@ int read_init_file(const char* filename)
             if (len_json > n)
             {
                 n += 255;
-                global.JSON = (char*)realloc(global.JSON, n);
+                global.JSON = (char*) realloc(global.JSON, n);
             }
             strncat(global.JSON, tmp, len_tmp);
             global.JSON[len_json] = '\0';
 		}
         
-		if (global.JSON[strlen(global.JSON) - 6] == '}' && global.JSON[strlen(global.JSON) - 3] == '}')
-			global.JSON[strlen(global.JSON) - 5] = '\0';
+		if (global.JSON[strlen(global.JSON) - 4] == '}' && global.JSON[strlen(global.JSON) - 2] == '}')
+			global.JSON[strlen(global.JSON) - 3] = '\0';
 	} else {
 		global.JSON = "{}";
         printf("\033[1;31mFailed to open parameter file %s\033[0m\n", filename);
@@ -102,11 +136,10 @@ int get_token(int start, int end, const char* token)
 
 void init_data()
 {
-	//T es decimated_number kimaradt
-	jsmn_parser p;
+    jsmn_parser p;
 	int n, r, x, y, object_end;
 	size_t len, regex_len, s, len_file_path;
-	char* regex_str, *toTest;
+	char* regex_str, *toTest, *path;
 
 	regex_len = 36;
     len_file_path = 50;
@@ -208,11 +241,11 @@ void init_data()
 			if ((y = get_token(x + 2, object_end, "partile_particle_screening_length")) >= 0)
 				global.partile_particle_screening_length = atof(substr(global.JSON, global.t[y + 1].start, global.t[y + 1].end - global.t[y + 1].start));
 			else
-				global.partile_particle_screening_length = 0.6;
+				global.partile_particle_screening_length = 4.0;
 		}
 	} else {
 		global.particle_driving_force = 0.2;
-		global.partile_particle_screening_length = 0.6;
+		global.partile_particle_screening_length = 04.0;
 	}
 
     global.partile_particle_screening_wavevector =  1.0 / global.partile_particle_screening_length;
@@ -255,9 +288,11 @@ void init_data()
     printf("\tTo movie file: %d\n", global.movie_time);
     printf("Total running time: %d\n", global.total_time);
 
-    global.moviefile_name = (char *)malloc(len_file_path);
-    strncpy(global.moviefile_name, "./results/movies/",  18);
-    global.moviefile_name[18] = '\0';
+    path = (char *) malloc(255);
+    getPathToResultFolder(path, 255);
+
+    global.moviefile_name = (char *) malloc(len_file_path);
+    snprintf(global.moviefile_name, len_file_path, "%smovies/",  path);
 	if ((x = get_token(1, r, "moviefile")) >= 0) {
 		regex_str = (char*) malloc(regex_len);
 		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
@@ -281,16 +316,15 @@ void init_data()
 		free(regex_str);
         free(toTest);
 	} else {
-        len = snprintf(NULL, 0, "./results/movies/result%2.2f.mvi", global.pinningsite_force);
-        global.moviefile_name = (char *)realloc(global.moviefile_name, len + 1);
-		snprintf(global.moviefile_name, len + 1, "./results/movies/result%2.2f.mvi", global.pinningsite_force);
+        len = snprintf(NULL, 0, "%smovies/result%2.2f.mvi", path, global.pinningsite_force);
+        global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
+		snprintf(global.moviefile_name, len + 1, "%smovies/result%2.2f.mvi", path, global.pinningsite_force);
     }
     printf("File names:\n");
 	printf("\tMoviefile: %s\n", global.moviefile_name);
     
-    global.statisticsfile_name = (char *)malloc(len_file_path);
-    strncpy(global.statisticsfile_name, "./results/stats/",  18);
-    global.statisticsfile_name[18] = '\0';
+    global.statisticsfile_name = (char *) malloc(len_file_path);
+    snprintf(global.statisticsfile_name, len_file_path, "%sstats/",  path);
 	if ((x = get_token(1, r, "statfile")) >= 0) {
 		regex_str = (char*) malloc(regex_len);
 		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
@@ -314,12 +348,13 @@ void init_data()
         free(regex_str);
         free(toTest);
 	} else {
-        len = snprintf(NULL, 0, "./results/stats/stat%2.2f.txt", global.pinningsite_force);
-        global.statisticsfile_name = (char *)realloc(global.statisticsfile_name, len + 1);
-		snprintf(global.statisticsfile_name, len + 1, "./results/stats/stat%2.2f.txt", global.pinningsite_force);
+        len = snprintf(NULL, 0, "%sstats/stat%2.2f.txt", path, global.pinningsite_force);
+        global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
+		snprintf(global.statisticsfile_name, len + 1, "%sstats/stat%2.2f.txt", path, global.pinningsite_force);
     }
 	printf("\tStatfile: %s\n", global.statisticsfile_name);
 
+    free(path);
 	free(global.t);
 }
 
@@ -373,15 +408,15 @@ void init_simulation()
 
 void init_pinningsites()
 {
-    global.pinningsite_x = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_y = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_fx = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_fy = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_color = (int *)malloc(global.N_pinningsites*sizeof(int));
-    global.pinningsite_direction_x = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_direction_y = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_dx_so_far = (double *)malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_dy_so_far = (double *)malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_x = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_y = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_fx = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_fy = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_color = (int *) malloc(global.N_pinningsites*sizeof(int));
+    global.pinningsite_direction_x = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_direction_y = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_dx_so_far = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_dy_so_far = (double *) malloc(global.N_pinningsites*sizeof(double));
 
     //init_pinningsites_square_lattice();
     init_pinningsites_triangular_lattice();
@@ -489,15 +524,15 @@ void init_pinningsites_triangular_lattice()
 
 void init_particles()
 {
-    global.particle_x = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_y = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_fx = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_fy = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_color = (int *)malloc(global.N_particles*sizeof(int));
-    global.particle_direction_x = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_direction_y = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_dx_so_far = (double *)malloc(global.N_particles*sizeof(double));
-    global.particle_dy_so_far = (double *)malloc(global.N_particles*sizeof(double));
+    global.particle_x = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_y = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_fx = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_fy = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_color = (int *) malloc(global.N_particles*sizeof(int));
+    global.particle_direction_x = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_direction_y = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_dx_so_far = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_dy_so_far = (double *) malloc(global.N_particles*sizeof(double));
 
     //init_particles_square_lattice();
     //init_particles_triangular_lattice();
@@ -739,7 +774,7 @@ void init_files()
 
 char* substr(const char* from, int start, int count)
 {
-    char* result = (char *)malloc(count + 1);
+    char* result = (char *) malloc(count + 1);
     int i, n;
     for (i = start, n = 0; i < start + count; i++, n++)
     {

@@ -23,13 +23,13 @@ void run_simulation()
     {
         //adjust_pinningsite_directions();
         //rotate_pinningsite_directions();
-        calculate_external_forces_on_pinningsites();
-        move_pinningsites();
+        // calculate_external_forces_on_pinningsites();
+        // move_pinningsites();
         //rebuild_pinning_grid();
         
         // calculate_external_forces_on_particles();
         calculate_pairwise_forces();
-        calculate_pinning_force_on_particles();
+        // calculate_pinning_force_on_particles();
 
         //this is where we calculate statistics
         calculate_statistics();
@@ -92,7 +92,6 @@ void rotate_pinningsite_directions()
     printf("%lf %lf\n", global.particle_direction_x[i], global.particle_direction_y[i]);
 
 }
-
 
 //change the direction of the pinning sites
 //they will move on a triangle
@@ -531,7 +530,7 @@ void calculate_statistics()
             if (f_proj > 0.0) 
             {
                 global.sumforce[j] += f_proj;
-                global.N_sum[j] ++;      
+                global.N_sum[j] ++;
             }
         }
 
