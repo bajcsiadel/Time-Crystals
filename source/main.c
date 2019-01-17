@@ -26,9 +26,7 @@ int main(int argc, const char * argv[]) {
         init_files();
         
         run_simulation();
-    } 
-    else 
-    {
+    } else {
         printf("\033[1;31mNot enough parameters! Parameter file missing!\nUsage: %s param.json\n\033[0m", argv[0]);
     }
     return 0;

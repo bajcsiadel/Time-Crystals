@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <time.h>
 
 #include "initializer.h"
 #include "globaldata.h"
@@ -78,9 +80,16 @@ int read_init_file(const char* filename)
             strncat(global.JSON, tmp, len_tmp);
             global.JSON[len_json] = '\0';
 		}
-        
-		if (global.JSON[strlen(global.JSON) - 4] == '}' && global.JSON[strlen(global.JSON) - 2] == '}')
-			global.JSON[strlen(global.JSON) - 3] = '\0';
+
+        char first = '\0';
+		for (int i = strlen(global.JSON); i >= 0; i--) {
+            if (!isspace(global.JSON[i]))
+                if (first == '\0') first = global.JSON[i];
+                else {
+                    if (first == global.JSON[i]) global.JSON[i + 1] = '\0';
+                    break;
+                }
+        }
 	} else {
 		global.JSON = "{}";
         printf("\033[1;31mFailed to open parameter file %s\033[0m\n", filename);
@@ -139,7 +148,7 @@ void init_data()
     jsmn_parser p;
 	int n, r, x, y, object_end;
 	size_t len, regex_len, s, len_file_path;
-	char* regex_str, *toTest, *path;
+	char* regex_str, *toTest, *path, *dot;
 
 	regex_len = 36;
     len_file_path = 50;
@@ -293,65 +302,43 @@ void init_data()
 
     global.moviefile_name = (char *) malloc(len_file_path);
     snprintf(global.moviefile_name, len_file_path, "%smovies/",  path);
-	if ((x = get_token(1, r, "moviefile")) >= 0) {
+    global.statisticsfile_name = (char *) malloc(len_file_path);
+    snprintf(global.statisticsfile_name, len_file_path, "%sstats/",  path);
+
+    srand(time(NULL));
+	if ((x = get_token(1, r, "filename")) >= 0) {
 		regex_str = (char*) malloc(regex_len);
 		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
         regex_str[15] = '\0';
         toTest = substr(global.JSON, global.t[x + 1].start, global.t[x + 1].end - global.t[x + 1].start);
-		if (check_file_name(regex_str, toTest)) 
-            strncat(toTest, ".mvi", 4);
-        s = strlen(regex_str) - 1;
-		regex_str[s] = '\0';
-		strncat(regex_str, "(\\.mvi)$", (size_t) 7);
-        regex_str[s + 7] = '\0';
-        len = strlen(global.moviefile_name);
 		if (!check_file_name(regex_str, toTest)) {
-            strncat(global.moviefile_name, "result.mvi", 10);
-            len += 10;
-        } else {
-            strncat(global.moviefile_name, toTest, strlen(toTest));
-            len +=strlen(toTest);
+            dot = strchr(toTest, '.');
+            if (dot != NULL) *dot = '\0';
         }
-        global.moviefile_name[len] = '\0'; 
+		if (!check_file_name(regex_str, toTest)) {
+            snprintf(toTest, 17, "%d_result_%d_%d", rand() % 100000, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+        } else {
+            strncat(global.moviefile_name, toTest, strlen(toTest) + 1);
+        }
 		free(regex_str);
-        free(toTest);
 	} else {
-        len = snprintf(NULL, 0, "%smovies/result%2.2f.mvi", path, global.pinningsite_force);
-        global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
-		snprintf(global.moviefile_name, len + 1, "%smovies/result%2.2f.mvi", path, global.pinningsite_force);
+        toTest = (char *) malloc(17);
+            snprintf(toTest, 17, "%d_result_%d_%d", rand() % 100000, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+        toTest[6] = '\0';
     }
+
+    len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
+    global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
+    snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, toTest);
+
+    len = snprintf(NULL, 0, "%sstats/%s.txt", path, toTest);
+    global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
+    snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
+
+    free(toTest);
+
     printf("File names:\n");
 	printf("\tMoviefile: %s\n", global.moviefile_name);
-    
-    global.statisticsfile_name = (char *) malloc(len_file_path);
-    snprintf(global.statisticsfile_name, len_file_path, "%sstats/",  path);
-	if ((x = get_token(1, r, "statfile")) >= 0) {
-		regex_str = (char*) malloc(regex_len);
-		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
-        regex_str[15] = '\0';
-		toTest = substr(global.JSON, global.t[x + 1].start, global.t[x + 1].end - global.t[x + 1].start);
-		if (check_file_name(regex_str, toTest)) 
-            strncat(toTest, ".txt", 4);
-        s = strlen(regex_str) - 1;
-		regex_str[s] = '\0';
-		strncat(regex_str, "(\\.txt)$", (size_t) 7);
-        regex_str[s + 7] = '\0';
-        len = strlen(global.statisticsfile_name);
-		if (!check_file_name(regex_str, toTest)) {
-            strncat(global.statisticsfile_name, "stat.txt", 8);
-            len += 9;
-        } else {
-            strncat(global.statisticsfile_name, toTest, strlen(toTest));
-            len += strlen(toTest);
-        }
-        global.statisticsfile_name[len] = '\0';
-        free(regex_str);
-        free(toTest);
-	} else {
-        len = snprintf(NULL, 0, "%sstats/stat%2.2f.txt", path, global.pinningsite_force);
-        global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
-		snprintf(global.statisticsfile_name, len + 1, "%sstats/stat%2.2f.txt", path, global.pinningsite_force);
-    }
 	printf("\tStatfile: %s\n", global.statisticsfile_name);
 
     free(path);
@@ -408,15 +395,15 @@ void init_simulation()
 
 void init_pinningsites()
 {
-    global.pinningsite_x = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_y = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_fx = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_fy = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_color = (int *) malloc(global.N_pinningsites*sizeof(int));
-    global.pinningsite_direction_x = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_direction_y = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_dx_so_far = (double *) malloc(global.N_pinningsites*sizeof(double));
-    global.pinningsite_dy_so_far = (double *) malloc(global.N_pinningsites*sizeof(double));
+    global.pinningsite_x = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_y = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_fx = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_fy = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_color = (int *) malloc(global.N_pinningsites * sizeof(int));
+    global.pinningsite_direction_x = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_direction_y = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_dx_so_far = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.pinningsite_dy_so_far = (double *) malloc(global.N_pinningsites * sizeof(double));
 
     //init_pinningsites_square_lattice();
     init_pinningsites_triangular_lattice();
@@ -524,15 +511,17 @@ void init_pinningsites_triangular_lattice()
 
 void init_particles()
 {
-    global.particle_x = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_y = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_fx = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_fy = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_color = (int *) malloc(global.N_particles*sizeof(int));
-    global.particle_direction_x = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_direction_y = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_dx_so_far = (double *) malloc(global.N_particles*sizeof(double));
-    global.particle_dy_so_far = (double *) malloc(global.N_particles*sizeof(double));
+    global.particle_x = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_y = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_fx = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_fy = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_color = (int *) malloc(global.N_particles * sizeof(int));
+    global.particle_direction_x = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_direction_y = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_dx_so_far = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_dy_so_far = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_all_dx = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_all_dy = (double *) malloc(global.N_particles * sizeof(double));
 
     //init_particles_square_lattice();
     //init_particles_triangular_lattice();
@@ -619,6 +608,8 @@ void init_particles_randomly()
         global.particle_y[i] = y_try;
         global.particle_dx_so_far[i] = 0.0;
         global.particle_dy_so_far[i] = 0.0;
+        global.particle_all_dx[i] = 0.0;
+        global.particle_all_dy[i] = 0.0;
         global.particle_fx[i] = 0.0;
         global.particle_fy[i] = 0.0;
         
@@ -660,6 +651,8 @@ void init_particles_square_lattice()
             global.particle_y[k] = (j + 0.5) * lattice_const;
             global.particle_dx_so_far[k] = 0.0;
             global.particle_dy_so_far[k] = 0.0;
+            global.particle_all_dx[k] = 0.0;
+            global.particle_all_dy[k] = 0.0;
             global.particle_fx[k] = 0.0;
             global.particle_fy[k] = 0.0;
             k++;
@@ -703,6 +696,8 @@ void init_particles_triangular_lattice()
             global.particle_y[k] = (j + 0.25) * lattice_const * (sqrt(3)/2.0);
             global.particle_dx_so_far[k] = 0.0;
             global.particle_dy_so_far[k] = 0.0;
+            global.particle_all_dx[k] = 0.0;
+            global.particle_all_dy[k] = 0.0;
             global.particle_fx[k] = 0.0;
             global.particle_fy[k] = 0.0;
             

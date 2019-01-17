@@ -450,6 +450,9 @@ void move_particles()
         
         global.particle_dx_so_far[i] += dx;
         global.particle_dy_so_far[i] += dy;
+
+        global.particle_all_dx[i] += dx;
+        global.particle_all_dy[i] += dy;
         
         fold_particle_back_PBC(i);
         
@@ -464,10 +467,10 @@ void fold_particle_back_PBC(int i)
     //assumes it did not jump more thana  box length
     //if it did the simulation is already broken anyhow
 
-    if (global.particle_x[i]<0) global.particle_x[i] += global.SX;
-    if (global.particle_y[i]<0) global.particle_y[i] += global.SY;
-    if (global.particle_x[i]>=global.SX) global.particle_x[i] -= global.SX;
-    if (global.particle_y[i]>=global.SY) global.particle_y[i] -= global.SY;
+    if (global.particle_x[i] < 0) global.particle_x[i] += global.SX;
+    if (global.particle_y[i] < 0) global.particle_y[i] += global.SY;
+    if (global.particle_x[i] >= global.SX) global.particle_x[i] -= global.SX;
+    if (global.particle_y[i] >= global.SY) global.particle_y[i] -= global.SY;
 }
 
 void write_cmovie_frame()
