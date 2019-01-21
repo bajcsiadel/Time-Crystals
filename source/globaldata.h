@@ -10,6 +10,7 @@
 #define globaldata_h
 
 #include <stdio.h>
+#include <time.h>
 #include "jsmn.h"
 
 struct global_struct
@@ -88,6 +89,9 @@ struct global_struct
 
     jsmntok_t* t;
     char* JSON;
+
+    time_t start_time;
+    time_t end_time;
     };
 
 struct flag_struct

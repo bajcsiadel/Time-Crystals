@@ -10,9 +10,10 @@
 #include <stdio.h>
 #include "initializer.h"
 #include "running.h"
+#include "color.h"
 
-int main(int argc, const char * argv[]) {
-    
+int main(int argc, const char * argv[])
+{    
     if (argc == 2)
     {
         read_init_file(argv[1]);
@@ -27,7 +28,9 @@ int main(int argc, const char * argv[]) {
         
         run_simulation();
     } else {
-        printf("\033[1;31mNot enough parameters! Parameter file missing!\nUsage: %s param.json\n\033[0m", argv[0]);
+        COLOR_ERROR;
+        printf("Not enough parameters! Parameter file missing!\nUsage: %s param.json\n", argv[0]);
+        COLOR_DEFAULT;
     }
     return 0;
 }

@@ -8,6 +8,8 @@
 
 #include "running.h"
 #include "globaldata.h"
+#include "color.h"
+
 #include <stdlib.h>
 #include <math.h>
 
@@ -19,6 +21,7 @@ void run_simulation()
     rebuild_Verlet_list();//build for the first time
     rebuild_pinning_grid(); //build for the first time
 
+    time(&global.start_time);
     for (global.time = 0; global.time <= global.total_time; global.time++)
     {
         //adjust_pinningsite_directions();
@@ -29,7 +32,7 @@ void run_simulation()
         
         // calculate_external_forces_on_particles();
         calculate_pairwise_forces();
-        // calculate_pinning_force_on_particles();
+        calculate_pinning_force_on_particles();
 
         //this is where we calculate statistics
         calculate_statistics();
@@ -59,6 +62,13 @@ void run_simulation()
             write_cmovie_frame();  
     }
     delete_arrays();
+
+    time(&global.end_time);
+
+    struct tm *start;
+    start = localtime(&global.start_time);
+    printf("Simulation\n\t- started at:\t%s\t", asctime(start));
+    write_time();
 }
 
 //change the direction of the pinning sites
@@ -544,14 +554,23 @@ void write_statistics()
     int j;
 
     printf("stat: %d %d %d\n",global.N_sum[0],global.N_sum[1],global.N_sum[2]);
-    fprintf(global.statisticsfile,"%d ",global.time);
+    fprintf(global.statisticsfile, "%d ", global.time);
+    double dx, dy;
+
+    dx = dy = 0.0;
+    for (j = 0; j < global.N_particles; j++) {
+        dx += global.particle_all_dx[j];
+        dy += global.particle_all_dy[j];
+    }
+    fprintf(global.statisticsfile, "%lf ", dx / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", dy / global.N_particles);
     for(j = 0; j < 3; j++)
     {
-        printf("%lf ",  (global.N_sum[j] == 0) ? 0 : global.sumforce[j]/(double)global.N_sum[j]);
-        fprintf(global.statisticsfile,"%lf ",(global.N_sum[j] == 0) ? 0 : global.sumforce[j]/(double)global.N_sum[j]);
+        printf("%lf ", (global.N_sum[j] == 0) ? 0 : global.sumforce[j] / (double) global.N_sum[j]);
+        fprintf(global.statisticsfile, "%lf ", (global.N_sum[j] == 0) ? 0 : global.sumforce[j] / (double) global.N_sum[j]);
     }
     printf("\n");
-    fprintf(global.statisticsfile,"\n");
+    fprintf(global.statisticsfile, "\n");
     fflush(global.statisticsfile);
 
     for(j = 0; j < 3; j++)
@@ -600,6 +619,37 @@ void test_program_by_coloring()
         }
 }
 
+void write_time()
+{
+    struct tm *end;
+    end = localtime(&global.end_time);
+
+    printf("- ended at:\t%s\t- total runtime: ", 
+        asctime(end));
+    double time_diff = difftime(global.end_time, global.start_time);
+    int day = time_diff / (60 * 60 * 24);
+    time_diff -= day;
+    int hour = time_diff / (60 * 60);
+    time_diff -= hour;
+    int minute = time_diff / 60;
+    time_diff -= minute;
+    int sec = time_diff;
+	COLOR_NOTE;
+    if (day != 0) 
+        if (day == 1) printf("1 day ");
+        else printf("%d days ", day);
+    if (hour != 0)
+        if (hour == 1) printf("1 hour ");
+        else printf("%d hours ", hour);
+    if (minute != 0) 
+        if (minute == 1) printf("1 minute ");
+        else printf("%d minutes ", minute);
+    printf("%d", sec);
+    if (sec <= 1) printf(" second\n");
+        else printf(" seconds\n");
+	COLOR_DEFAULT;
+}
+
 void delete_arrays() 
 {
     free(global.moviefile_name);
@@ -613,4 +663,6 @@ void delete_arrays()
     free(global.pinningsite_direction_y);
     free(global.pinningsite_dx_so_far);
     free(global.pinningsite_dy_so_far);
+    free(global.particle_all_dx);
+    free(global.particle_all_dy);
 }

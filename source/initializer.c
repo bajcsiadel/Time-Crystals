@@ -16,6 +16,7 @@
 
 #include "initializer.h"
 #include "globaldata.h"
+#include "color.h"
 
 #ifdef WINDOWS
     #include <direct.h>
@@ -92,8 +93,10 @@ int read_init_file(const char* filename)
         }
 	} else {
 		global.JSON = "{}";
-        printf("\033[1;31mFailed to open parameter file %s\033[0m\n", filename);
+        COLOR_ERROR;
+        printf("Failed to open parameter file %s\n", filename);
         fflush(stdout);
+        COLOR_DEFAULT;
         exit(1);
 	}
 
@@ -109,7 +112,9 @@ int check_file_name(const char* regex_str, char* toTest)
 
 	if (regcomp(&regexCompiled, regex_str, REG_EXTENDED))
 	{
-		printf("\033[1;31mCould not create regex!\033[0m\n");
+        COLOR_ERROR;
+		printf("Could not create regex!\n");
+        COLOR_DEFAULT;
 		return 0;
 	}
 
@@ -157,7 +162,9 @@ void init_data()
 	jsmn_init(&p);
 	n = jsmn_parse(&p, global.JSON, len, global.t, 0);
 	if (n < 0) {
-		printf("\033[1;31mSome error occured!\033[0m\n");
+        COLOR_ERROR;
+		printf("Some error occured!\n");
+        COLOR_DEFAULT;
 		return;
 	} else {
 		global.t = (jsmntok_t*) malloc(sizeof(jsmntok_t) * n);
@@ -165,7 +172,9 @@ void init_data()
 	jsmn_init(&p);
 	r = jsmn_parse(&p, global.JSON, len, global.t, n);
 	if (r < 1 && !global.t[0].type == JSMN_OBJECT) {
-		printf("\033[1;31mJSON object not found!\033[0m\n");
+        COLOR_ERROR;
+		printf("JSON object not found!\n");
+        COLOR_DEFAULT;
 		return;
 	}
 	
@@ -600,7 +609,9 @@ void init_particles_randomly()
             
         if (N_trials==global.N_particles)
         {
-            printf("/033[1;31mCan't place particles randomly, quitting\n\033[0m");
+            COLOR_ERROR;
+            printf("Can't place particles randomly, quitting\n");
+            COLOR_DEFAULT;
             exit(1);
         }
         
@@ -669,8 +680,8 @@ void init_particles_triangular_lattice()
     int N_rows, N_columns;
     double lattice_const;
 
-    N_columns = (int)sqrt((double)global.N_particles);
-    lattice_const = global.SX/(double)N_columns;
+    N_columns = (int) sqrt((double) global.N_particles);
+    lattice_const = global.SX / (double) N_columns;
     global.pinning_lattice_constant = lattice_const;
 
     //keeping same number of rows and columns
@@ -684,16 +695,16 @@ void init_particles_triangular_lattice()
     */
 
     global.SY = N_rows * lattice_const * (sqrt(3)/2.0);
-    global.halfSY = global.SY/2.0;
+    global.halfSY = global.SY / 2.0;
     printf("Rescaled SY to = %.2lf\n", global.SY);
 
-    k=0;
+    k = 0;
 
-    for(i=0;i<N_rows;i++)
-        for(j=0;j<N_columns;j++)
-            {
-            global.particle_x[k] = (i + 0.25 + 0.5*(j%2) ) * lattice_const;
-            global.particle_y[k] = (j + 0.25) * lattice_const * (sqrt(3)/2.0);
+    for(i = 0; i < N_rows; i++)
+        for(j = 0; j < N_columns; j++)
+        {
+            global.particle_x[k] = (i + 0.25 + 0.5 * (j % 2)) * lattice_const;
+            global.particle_y[k] = (j + 0.25) * lattice_const * (sqrt(3) / 2.0);
             global.particle_dx_so_far[k] = 0.0;
             global.particle_dy_so_far[k] = 0.0;
             global.particle_all_dx[k] = 0.0;
@@ -703,14 +714,14 @@ void init_particles_triangular_lattice()
             
             //set the color and direction of the particle
             
-            if (j%2==0) global.particle_color[k] = 2 + i % 3;
-            else global.particle_color[k] = 2 + (i+2) % 3;
+            if (j % 2 == 0) global.particle_color[k] = 2 + i % 3;
+            else global.particle_color[k] = 2 + (i + 2) % 3;
             
             //printf("%d %d %d\n", i, j, global.particle_color[k]);
             
             //driection based on color
-            switch (global.particle_color[k]-2)
-                {
+            switch (global.particle_color[k] - 2)
+            {
                 case 0: {
                         global.particle_direction_x[k] = - 0.5;
                         global.particle_direction_y[k] = - sqrt(3)/2.0;
@@ -726,9 +737,9 @@ void init_particles_triangular_lattice()
                         global.particle_direction_y[k] = + sqrt(3)/2.0;
                         break;
                         }
-                }
-            k++;
             }
+            k++;
+        }
 
     printf("Particles initialized\n");
     printf("N_particles = %d\n", k);
@@ -737,16 +748,18 @@ void init_particles_triangular_lattice()
     FILE *test;
 
     test = fopen("testfile1.txt", "wt");
-    for(i=0;i<global.N_particles;i++)
-        if (global.particle_color[i]==0) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
+    for(i = 0; i < global.N_particles; i++)
+        if (global.particle_color[i] == 0) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
     fclose(test);
+
     test = fopen("testfile2.txt", "wt");
-    for(i=0;i<global.N_particles;i++)
-        if (global.particle_color[i]==1) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
+    for(i = 0; i < global.N_particles; i++)
+        if (global.particle_color[i] == 1) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
     fclose(test);
+    
     test = fopen("testfile3.txt", "wt");
-    for(i=0;i<global.N_particles;i++)
-        if (global.particle_color[i]==2) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
+    for(i = 0; i < global.N_particles; i++)
+        if (global.particle_color[i] ==     2) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
     fclose(test);
 }
 
@@ -755,14 +768,18 @@ void init_files()
     global.moviefile = fopen(global.moviefile_name, "wb");
     if (global.moviefile == NULL)
     {
-        printf("\033[1;31mCould not create/open movie file\033[0m\n");
+        COLOR_ERROR;
+        printf("Could not create/open movie file\n");
+        COLOR_DEFAULT;
         exit(2);
     }
 
     global.statisticsfile = fopen(global.statisticsfile_name, "wt");
     if (global.statisticsfile == NULL)
     {
-        printf("\033[1;31mCould not create/open statistics file\033[0m\n");
+        COLOR_ERROR;
+        printf("Could not create/open statistics file\n");
+        COLOR_DEFAULT;
         exit(2);
     }
 }

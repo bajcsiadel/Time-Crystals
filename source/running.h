@@ -10,6 +10,7 @@
 #define running_h
 
 #include <stdio.h>
+#include <time.h>
 
 void run_simulation(void);
 
@@ -40,6 +41,7 @@ void write_statistics(void);
 //functions for testing the program
 void test_program_by_coloring(void);
 
+void write_time();
 void delete_arrays();
 
 #endif /* running_h */

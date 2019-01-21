@@ -5,3 +5,5 @@ build
 *test*
 *~
 *.vscode
+*.json
+!config.json
