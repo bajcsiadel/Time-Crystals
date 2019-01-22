@@ -7,9 +7,9 @@ cd ../
 
 for param in `ls -a ./parameters | egrep '.json$'`
 do
-    NUMBER=`echo $param | tr -dc '0-9'`
-    nr=$(($nr+1))
-    build/softsim parameters/$param > results/outs/out_$NUMBER.txt &
+    NAME=`echo $param | cut -d'.' -f1`
+    NUMBER=$((RANDOM + 1))
+    build/softsim parameters/$param > results/outs/out_$NAME\_$NUMBER.txt &
 
     nr_runnings=`ps -e | grep "softsim" | wc -l`
     while [ $nr_runnings -ge 30 ]
