@@ -64,10 +64,6 @@ void run_simulation()
     delete_arrays();
 
     time(&global.end_time);
-
-    struct tm *start;
-    start = localtime(&global.start_time);
-    printf("Simulation\n\t- started at:\t%s\t", asctime(start));
     write_time();
 }
 
@@ -621,11 +617,10 @@ void test_program_by_coloring()
 
 void write_time()
 {
-    struct tm *end;
-    end = localtime(&global.end_time);
-
+	printf("Simulation\n\t- started at:\t%s\t", 
+        ctime(&global.start_time));
     printf("- ended at:\t%s\t- total runtime: ", 
-        asctime(end));
+        ctime(&global.end_time));
     double time_diff = difftime(global.end_time, global.start_time);
     int day = time_diff / (60 * 60 * 24);
     time_diff -= day;
