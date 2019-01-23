@@ -20,10 +20,29 @@
 
 #ifdef WINDOWS
     #include <direct.h>
+    #include <windows.h>
     #define GetCurrentDir _getcwd
+    int fileExists(const char *filename)
+    {
+        WIN32_FIND_DATA FindFileData;
+        HANDLE handle = FindFirstFile(filename, &FindFileData) ;
+        int found = handle != INVALID_HANDLE_VALUE;
+        if (found) {
+            FindClose(handle);
+            return 1;
+        } else
+            return 0;
+    }
 #else   // LINUX or MAC
     #include <unistd.h>
     #define GetCurrentDir getcwd
+    int fileExists(const char *filename)
+    {
+        if (access(filename, F_OK) != -1)
+            return 1;
+        else
+            return 0;
+    }
 #endif
 
 void getCurrentWorkingDir(char *current_working_dir) {
@@ -343,6 +362,18 @@ void init_data()
     len = snprintf(NULL, 0, "%sstats/%s.txt", path, toTest);
     global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
     snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
+
+    if (fileExists(global.moviefile_name) || fileExists(global.statisticsfile_name)) {
+        snprintf(&toTest[strlen(toTest)], 6, "_%d", rand() % 100000);
+
+        len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
+        global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
+        snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, toTest);
+
+        len = snprintf(NULL, 0, "%sstats/%s.txt", path, toTest);
+        global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
+        snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
+    }
 
     free(toTest);
 
@@ -756,7 +787,7 @@ void init_particles_triangular_lattice()
     for(i = 0; i < global.N_particles; i++)
         if (global.particle_color[i] == 1) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);
     fclose(test);
-    
+
     test = fopen("testfile3.txt", "wt");
     for(i = 0; i < global.N_particles; i++)
         if (global.particle_color[i] ==     2) fprintf(test, "%lf %lf\n", global.particle_x[i], global.particle_y[i]);

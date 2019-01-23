@@ -623,11 +623,11 @@ void write_time()
         ctime(&global.end_time));
     double time_diff = difftime(global.end_time, global.start_time);
     int day = time_diff / (60 * 60 * 24);
-    time_diff -= day;
+    time_diff -= day * 60 * 60 * 24;
     int hour = time_diff / (60 * 60);
-    time_diff -= hour;
+    time_diff -= hour * 60 * 60;
     int minute = time_diff / 60;
-    time_diff -= minute;
+    time_diff -= minute * 60;
     int sec = time_diff;
 	COLOR_NOTE;
     if (day != 0) 
