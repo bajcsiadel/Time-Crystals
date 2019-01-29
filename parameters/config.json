@@ -18,7 +18,7 @@
 	},
 	"dt": 0.001,
 	"statistics_time": 1000,
-	"movei_time": 100,
+	"movie_time": 100,
 	"time_echo": 1000,
 	"total_time": 200000
 }

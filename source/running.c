@@ -658,6 +658,19 @@ void delete_arrays()
     free(global.pinningsite_direction_y);
     free(global.pinningsite_dx_so_far);
     free(global.pinningsite_dy_so_far);
+    
+    free(global.particle_x);
+    free(global.particle_y);
+    free(global.particle_fx);
+    free(global.particle_fy);
+    free(global.particle_color);
+    free(global.particle_direction_x);
+    free(global.particle_direction_y);
+    free(global.particle_dx_so_far);
+    free(global.particle_dy_so_far);
     free(global.particle_all_dx);
     free(global.particle_all_dy);
+
+    free(global.Verletlisti);
+    free(global.Verletlistj);
 }

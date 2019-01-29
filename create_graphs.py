@@ -1,4 +1,5 @@
 import re
+import sys
 import pprint as pp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,8 +8,12 @@ from os import listdir
 from os.path import isfile, join
 from datetime import datetime
 
+regex_pattern = ".*"
+if len(sys.argv) == 2:
+    regex_pattern = sys.argv[1]
+
 path = './results/stats/'
-files = [f for f in listdir(path)]
+files = [f for f in listdir(path) if re.match(regex_pattern, f)]
 files.sort()
 pp.pprint(files)
 
@@ -26,8 +31,9 @@ for i, f in enumerate(files):
             x.append(float(l[1]))
             y.append(float(l[2]))
 
-        r = [x[i]*x[i] + y[i]*y[i] for i in range(len(x))]
+        r = [np.sqrt(x[i]*x[i] + y[i]*y[i]) for i in range(len(x))]
 
+        plt.title(f)
         plt.plot(t, r, label=f.split('.')[0])
 
 lgd = plt.legend()
