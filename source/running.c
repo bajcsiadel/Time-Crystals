@@ -18,7 +18,7 @@
 //runs the simulation for the required steps
 void run_simulation()
 {
-    rebuild_Verlet_list();//build for the first time
+    rebuild_Verlet_list(); //build for the first time
     rebuild_pinning_grid(); //build for the first time
 
     time(&global.start_time);
@@ -26,8 +26,8 @@ void run_simulation()
     {
         //adjust_pinningsite_directions();
         //rotate_pinningsite_directions();
-        // calculate_external_forces_on_pinningsites();
-        // move_pinningsites();
+        calculate_external_forces_on_pinningsites();
+        move_pinningsites();
         //rebuild_pinning_grid();
         
         // calculate_external_forces_on_particles();
@@ -41,7 +41,7 @@ void run_simulation()
         check_Verlet_rebuild_condition_and_set_flag();
         
         //one particle moved enough to rebuild the Verlet list
-        if (global.flag_to_rebuild_Verlet==1)
+        if (global.flag_to_rebuild_Verlet == 1)
             rebuild_Verlet_list();
         
         //echo time

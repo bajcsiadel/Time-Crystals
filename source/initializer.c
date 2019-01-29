@@ -333,7 +333,9 @@ void init_data()
     global.statisticsfile_name = (char *) malloc(len_file_path);
     snprintf(global.statisticsfile_name, len_file_path, "%sstats/",  path);
 
-    srand(time(NULL));
+    time_t now = time(NULL);
+    char buff[16];
+    strftime(buff, 16, "%Y%m%d_%H%M%S", localtime(&now));
 	if ((x = get_token(1, r, "filename")) >= 0) {
 		regex_str = (char*) malloc(regex_len);
 		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
@@ -344,14 +346,14 @@ void init_data()
             if (dot != NULL) *dot = '\0';
         }
 		if (!check_file_name(regex_str, toTest)) {
-            snprintf(toTest, 17, "%d_result_%d_%d", rand() % 100000, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+            snprintf(toTest, 17, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
         } else {
             strncat(global.moviefile_name, toTest, strlen(toTest) + 1);
         }
 		free(regex_str);
 	} else {
         toTest = (char *) malloc(17);
-            snprintf(toTest, 17, "%d_result_%d_%d", rand() % 100000, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+        snprintf(toTest, 17, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
         toTest[6] = '\0';
     }
 
@@ -364,7 +366,7 @@ void init_data()
     snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
 
     if (fileExists(global.moviefile_name) || fileExists(global.statisticsfile_name)) {
-        snprintf(&toTest[strlen(toTest)], 6, "_%d", rand() % 100000);
+        snprintf(&toTest[strlen(toTest)], 16, "_%s", buff);
 
         len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
         global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
