@@ -364,23 +364,23 @@ void rebuild_Verlet_list()
 
 void rebuild_pinning_grid()
 {
-    int i, j;
+    unsigned int i, j;
     int gi, gj;
 
-    if (global.pinningsite_grid==NULL)
+    if (global.pinningsite_grid == NULL)
     {
         //build the pinningsite grid for the first time;
-        global.Nx_pinningsite_grid = (int) (global.SX/global.pinningsite_R) + 1;
-        global.Ny_pinningsite_grid = (int) (global.SY/global.pinningsite_R) + 1;
+        global.Nx_pinningsite_grid = (int) (global.SX / (2 * global.pinningsite_R)) + 1;
+        global.Ny_pinningsite_grid = (int) (global.SY / (2 * global.pinningsite_R)) + 1;
         printf("Pinning sites grid is %d x %d\n", global.Nx_pinningsite_grid, global.Ny_pinningsite_grid);
-        global.pinningsite_grid_dx = global.SX/global.Nx_pinningsite_grid;
-        global.pinningsite_grid_dy = global.SX/global.Ny_pinningsite_grid;
+        global.pinningsite_grid_dx = global.SX / global.Nx_pinningsite_grid;
+        global.pinningsite_grid_dy = global.SX / global.Ny_pinningsite_grid;
         printf("Pinning sites cell is %.2lf x %.2lf\n", global.pinningsite_grid_dx, global.pinningsite_grid_dy);
         printf("Pinning sites radius is = %.2lf\n", global.pinningsite_R);
         
         //initialize the grid
         global.pinningsite_grid = (int **) malloc(global.Nx_pinningsite_grid * sizeof(int *));
-        for(i=0;i<global.Nx_pinningsite_grid;i++)
+        for(i = 0;i<global.Nx_pinningsite_grid;i++)
             global.pinningsite_grid[i] = (int *) malloc(global.Ny_pinningsite_grid * sizeof(int));
     }
         
@@ -529,27 +529,12 @@ void write_cmovie_frame()
 
 void calculate_statistics()
 {
-    int i,j;
-    double f_proj;
-
-    for (i = 0; i < global.N_particles; i++)
-        for (j = 0; j < 3; j++) //all 3 directions
-        {
-            f_proj = global.particle_fx[i] * global.ex[j] + global.particle_fy[i] * global.ey[j];
-            if (f_proj > 0.0) 
-            {
-                global.sumforce[j] += f_proj;
-                global.N_sum[j] ++;
-            }
-        }
-
 }
 
 void write_statistics()
 {
     int j;
 
-    printf("stat: %d %d %d\n",global.N_sum[0],global.N_sum[1],global.N_sum[2]);
     fprintf(global.statisticsfile, "%d ", global.time);
     double dx, dy;
 
@@ -560,20 +545,8 @@ void write_statistics()
     }
     fprintf(global.statisticsfile, "%lf ", dx / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", dy / global.N_particles);
-    for(j = 0; j < 3; j++)
-    {
-        printf("%lf ", (global.N_sum[j] == 0) ? 0 : global.sumforce[j] / (double) global.N_sum[j]);
-        fprintf(global.statisticsfile, "%lf ", (global.N_sum[j] == 0) ? 0 : global.sumforce[j] / (double) global.N_sum[j]);
-    }
-    printf("\n");
     fprintf(global.statisticsfile, "\n");
     fflush(global.statisticsfile);
-
-    for(j = 0; j < 3; j++)
-    {
-        global.N_sum[j] = 0;
-        global.sumforce[j] = 0.0;
-    }
 
 }
 

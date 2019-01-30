@@ -61,8 +61,8 @@ struct global_struct
     double pinningsite_setradius;
     double pinningsite_grid_dx;
     double pinningsite_grid_dy;
-    int Nx_pinningsite_grid;
-    int Ny_pinningsite_grid;
+    unsigned int Nx_pinningsite_grid;
+    unsigned int Ny_pinningsite_grid;
     int **pinningsite_grid;
     
     
@@ -72,15 +72,11 @@ struct global_struct
     
     double dt;
     
-    int total_time;
-    int echo_time;
-    int movie_time;
-    int statistics_time;
-    int time;
-    
-    double ex[3],ey[3],ez[3];  //unit vectors for the 3 directions
-    double sumforce[3];        //force summed in these 3 directions
-    int N_sum[3];              //how many additions were performed
+    unsigned int total_time;
+    unsigned int echo_time;
+    unsigned int movie_time;
+    unsigned int statistics_time;
+    unsigned int time;
 
     FILE *moviefile;
     char *moviefile_name;

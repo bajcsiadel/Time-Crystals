@@ -14,7 +14,7 @@
 	"particle": {
 		"N_particles": 2000,
 		"particle_driving_force": 0.0,
-		"partile_particle_screening_length": 2.0
+		"partile_particle_screening_length": 4.0
 	},
 	"dt": 0.001,
 	"statistics_time": 1000,

@@ -282,7 +282,7 @@ void init_data()
 		}
 	} else {
 		global.particle_driving_force = 0.2;
-		global.partile_particle_screening_length = 04.0;
+		global.partile_particle_screening_length = 4.0;
 	}
 
     global.partile_particle_screening_wavevector =  1.0 / global.partile_particle_screening_length;
@@ -413,26 +413,6 @@ void init_simulation()
     global.pinningsite_grid = NULL;
     global.Nx_pinningsite_grid = 0;
     global.Ny_pinningsite_grid = 0;
-
-    //init the unit vectors for the 3 directions
-    //left and down
-    global.ex[0] =  -0.5;
-    global.ey[0] =  -sqrt(3)/2.0;
-    //right
-    global.ex[1] =  1.0;
-    global.ey[1] =  0.0;
-    //left and up
-    global.ex[2] =  -0.5;
-    global.ey[2] =  sqrt(3)/2.0;
-        
-    global.sumforce[0] = 0.0;
-    global.sumforce[1] = 0.0;
-    global.sumforce[2] = 0.0;
-    
-    global.N_sum[0] = 0;
-    global.N_sum[1] = 0;
-    global.N_sum[2] = 0;
-    
 }
 
 void init_pinningsites()

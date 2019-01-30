@@ -34,7 +34,9 @@ for i, f in enumerate(files):
         r = [np.sqrt(x[i]*x[i] + y[i]*y[i]) for i in range(len(x))]
 
         plt.title(f)
-        plt.plot(t, r, label=f.split('.')[0])
+        # plt.plot(t, r, label=f.split('.')[0])
+        plt.plot(t, x, label='x')
+        plt.plot(t, y, label='y')
 
 lgd = plt.legend()
 image_name = 'distances.png'
