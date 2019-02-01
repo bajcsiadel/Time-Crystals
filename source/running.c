@@ -28,7 +28,7 @@ void run_simulation()
         //rotate_pinningsite_directions();
         calculate_external_forces_on_pinningsites();
         move_pinningsites();
-        //rebuild_pinning_grid();
+        rebuild_pinning_grid();
         
         // calculate_external_forces_on_particles();
         calculate_pairwise_forces();
@@ -62,6 +62,9 @@ void run_simulation()
             write_cmovie_frame();  
     }
     delete_arrays();
+    
+    fclose(global.moviefile);
+    fclose(global.statisticsfile);
 
     time(&global.end_time);
     write_time();
@@ -183,10 +186,10 @@ void fold_pinningsite_back_PBC(int i)
     //assumes it did not jump more thana  box length
     //if it did the simulation is already broken anyhow
 
-    if (global.pinningsite_x[i]<0) global.pinningsite_x[i] += global.SX;
-    if (global.pinningsite_y[i]<0) global.pinningsite_y[i] += global.SY;
-    if (global.pinningsite_x[i]>=global.SX) global.pinningsite_x[i] -= global.SX;
-    if (global.pinningsite_y[i]>=global.SY) global.pinningsite_y[i] -= global.SY;
+    if (global.pinningsite_x[i] < 0) global.pinningsite_x[i] += global.SX;
+    if (global.pinningsite_y[i] < 0) global.pinningsite_y[i] += global.SY;
+    if (global.pinningsite_x[i] >= global.SX) global.pinningsite_x[i] -= global.SX;
+    if (global.pinningsite_y[i] >= global.SY) global.pinningsite_y[i] -= global.SY;
 }
 
 void calculate_external_forces_on_particles()
@@ -245,22 +248,43 @@ void calculate_pairwise_forces()
 
 void calculate_pinning_force_on_particles()
 {
-    int i, j;
+    unsigned int i, j, k, n, m;
+    int gi, gj, gj2;
     double dr2, dx, dy;
     double r, x, y;
 
     r = global.pinningsite_R;
-    for (i = 0; i < global.N_pinningsites; i++)
+    for (i = 0; i < global.N_particles; i++)
     {
-        x = global.pinningsite_x[i];
-        y = global.pinningsite_y[i];
-        for (j = 0; j < global.N_particles; j++)
-        {
-            distance_squared_folded_PBC(x, y, global.particle_x[j], global.particle_y[j], &dr2, &dx, &dy);
-            if (dr2 < r * r)
-            {
-                global.particle_fx[j] -= dx / r * global.pinningsite_force;
-                global.particle_fy[j] -= dy / r * global.pinningsite_force;
+        x = global.particle_x[i];
+        y = global.particle_y[i];
+
+        gi = (int) (x / global.pinningsite_grid_dx) - 1;
+        gj = (int) (y / global.pinningsite_grid_dy) - 1;
+
+        for (m = 0; m < 3; m++) {
+            if (gi == -1) gi = global.Nx_pinningsite_grid - 1;
+            else if (gi == global.Nx_pinningsite_grid - 1) gi = 0;
+            else gi ++;
+
+            gj2 = gj;
+            for (n = 0; n < 3; n++) {
+                if (gj2 == -1) gj2 = global.Ny_pinningsite_grid - 1;
+                else if (gj2 == global.Ny_pinningsite_grid - 1) gj2 = 0;
+                else gj2 ++;
+
+                j = 0;
+                while (j < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj2][j] != -1)
+                {
+                    k = global.pinningsite_grid[gi][gj2][j];
+                    distance_squared_folded_PBC(x, y, global.pinningsite_x[k], global.pinningsite_y[k], &dr2, &dx, &dy);
+                    if (dr2 < r * r)
+                    {
+                        global.particle_fx[i] += dx / r * global.pinningsite_force;
+                        global.particle_fy[i] += dy / r * global.pinningsite_force;
+                    }
+                    j ++;
+                }
             }
         }
     }
@@ -310,7 +334,7 @@ void rebuild_Verlet_list()
         printf("Particles in a R = %.2lf shell = %lf\n", 
             global.Verlet_cutoff_distance, estimation);
         
-        global.N_Verlet_max = (int)estimation * global.N_particles / 2;
+        global.N_Verlet_max = (int) estimation * global.N_particles / 2;
         printf("Estimated N_Verlet_max = %d\n", global.N_Verlet_max);
         
         global.Verletlisti = (int *) malloc(global.N_Verlet_max * sizeof(int));
@@ -364,36 +388,42 @@ void rebuild_Verlet_list()
 
 void rebuild_pinning_grid()
 {
-    unsigned int i, j;
-    int gi, gj;
+    unsigned int i, j, k;
+    unsigned int gi, gj;
 
     if (global.pinningsite_grid == NULL)
     {
         //build the pinningsite grid for the first time;
         global.Nx_pinningsite_grid = (int) (global.SX / (2 * global.pinningsite_R)) + 1;
         global.Ny_pinningsite_grid = (int) (global.SY / (2 * global.pinningsite_R)) + 1;
+        // global.Nx_pinningsite_grid = 3;
+        // global.Ny_pinningsite_grid = 3;
+        global.max_pinningsite_per_grid = 500;
         printf("Pinning sites grid is %d x %d\n", global.Nx_pinningsite_grid, global.Ny_pinningsite_grid);
         global.pinningsite_grid_dx = global.SX / global.Nx_pinningsite_grid;
-        global.pinningsite_grid_dy = global.SX / global.Ny_pinningsite_grid;
+        global.pinningsite_grid_dy = global.SY / global.Ny_pinningsite_grid;
         printf("Pinning sites cell is %.2lf x %.2lf\n", global.pinningsite_grid_dx, global.pinningsite_grid_dy);
-        printf("Pinning sites radius is = %.2lf\n", global.pinningsite_R);
         
         //initialize the grid
-        global.pinningsite_grid = (int **) malloc(global.Nx_pinningsite_grid * sizeof(int *));
-        for(i = 0;i<global.Nx_pinningsite_grid;i++)
-            global.pinningsite_grid[i] = (int *) malloc(global.Ny_pinningsite_grid * sizeof(int));
+        global.pinningsite_grid = (int ***) malloc(global.Nx_pinningsite_grid * sizeof(int **));
+        for(i = 0; i < global.Nx_pinningsite_grid; i++) {
+            global.pinningsite_grid[i] = (int **) malloc(global.Ny_pinningsite_grid * sizeof(int *));
+            for (j = 0; j < global.Ny_pinningsite_grid; j++)
+                global.pinningsite_grid[i][j] = (int *) malloc(global.max_pinningsite_per_grid * sizeof(int)); 
+        }
     }
         
     //always do this - zero the values
-    for(i=0;i<global.Nx_pinningsite_grid;i++)
-        for(j=0;j<global.Ny_pinningsite_grid;j++)
-            global.pinningsite_grid[i][j] = -1;
+    for (i = 0; i < global.Nx_pinningsite_grid; i++)
+        for (j = 0; j < global.Ny_pinningsite_grid; j++)
+            for (k = 0; k < global.max_pinningsite_per_grid; k++)
+                global.pinningsite_grid[i][j][k] = -1;
         
     //always do this - fill up the values
-    for(i=0;i<global.N_pinningsites;i++)
+    for (i = 0; i < global.N_pinningsites; i++)
     {
-        gi = (int) global.pinningsite_x[i]/global.pinningsite_grid_dx;
-        gj = (int) global.pinningsite_y[i]/global.pinningsite_grid_dy;
+        gi = (unsigned int) (global.pinningsite_x[i] / global.pinningsite_grid_dx);
+        gj = (unsigned int) (global.pinningsite_y[i] / global.pinningsite_grid_dy);
         
         /*if ((gi>=global.Nx_pinningsite_grid)||(gj>=global.Ny_pinningsite_grid))
             {
@@ -401,9 +431,18 @@ void rebuild_pinning_grid()
             exit(1);
             }*/
         //this cannot fail (hopefully)
-        global.pinningsite_grid[gi][gj] = i;
+        k = 0;
+        while (k < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj][k] != -1) k++;
+        if (k == global.max_pinningsite_per_grid)
+        {
+            COLOR_WARNING;
+            printf("Too much pinningsite in one grid!\n");
+            COLOR_DEFAULT;
+        } else {
+            global.pinningsite_grid[gi][gj][k] = i;
+        }
     }
-
+    test_program_by_coloring();
 }
 
 
@@ -558,7 +597,7 @@ void write_statistics()
 void test_program_by_coloring()
 {
     int ii;
-    int i, j;
+    int i, j, k;
 
     //testing the Verlet list by coloring one particle's neightbors one color
     /*
@@ -576,16 +615,18 @@ void test_program_by_coloring()
     */
 
     //testing the pinning grid by coloring the pins
-    for(i=0;i<global.Nx_pinningsite_grid;i++)
-        for(j=0;j<global.Ny_pinningsite_grid;j++)
-        {
-            if (global.pinningsite_grid[i][j]!=-1)
-            {
-                global.pinningsite_color[global.pinningsite_grid[i][j]] = i%2 + 2;
-                printf("%d %d (%d)-> %d\n", i, j, global.pinningsite_grid[i][j], i%2 + 2);
-                printf("%d\n", global.pinningsite_color[global.pinningsite_grid[i][j]]);
-            }
-        }
+    for(i = 0; i < global.Nx_pinningsite_grid; i++)
+        for(j = 0; j < global.Ny_pinningsite_grid; j++)
+            for (k = 0; k < global.max_pinningsite_per_grid; k++)
+                if (global.pinningsite_grid[i][j][k] == -1)
+                    break;
+                else
+                {
+                    int d = global.pinningsite_grid[i][j][k];
+                    global.pinningsite_color[d] = (i + j) % 2 + 4;
+                    // if (d < 24)
+                    //     printf("%d: (%lf, %lf) -> (%d, %d) -> %d\n", d, global.pinningsite_x[d], global.pinningsite_y[d], i, j, global.pinningsite_color[d]);
+                }
 }
 
 void write_time()
@@ -646,4 +687,12 @@ void delete_arrays()
 
     free(global.Verletlisti);
     free(global.Verletlistj);
+
+    unsigned int i, j;
+    for (i = 0; i < global.Nx_pinningsite_grid; i++) {
+        for (j = 0; j < global.Ny_pinningsite_grid; j++)
+            free(global.pinningsite_grid[i][j]);
+        free(global.pinningsite_grid[i]);
+    }
+    free(global.pinningsite_grid);
 }

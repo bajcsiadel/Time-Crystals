@@ -413,6 +413,7 @@ void init_simulation()
     global.pinningsite_grid = NULL;
     global.Nx_pinningsite_grid = 0;
     global.Ny_pinningsite_grid = 0;
+    global.max_pinningsite_per_grid = 0;
 }
 
 void init_pinningsites()

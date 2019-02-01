@@ -58,13 +58,12 @@ struct global_struct
     int *Verletlistj;
     int flag_to_rebuild_Verlet;
     
-    double pinningsite_setradius;
     double pinningsite_grid_dx;
     double pinningsite_grid_dy;
     unsigned int Nx_pinningsite_grid;
     unsigned int Ny_pinningsite_grid;
-    int **pinningsite_grid;
-    
+    int ***pinningsite_grid;
+    unsigned int max_pinningsite_per_grid;
     
     double Verlet_cutoff_distance;
     double Verlet_cutoff_distance_squared;
