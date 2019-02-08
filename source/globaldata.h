@@ -30,6 +30,7 @@ struct global_struct
     double *pinningsite_dy_so_far;
     double pinningsite_R;
     double pinningsite_force;
+    unsigned int *particle_in_pinningsite;
     
     double pinning_lattice_constant;
     double pinning_driving_force;

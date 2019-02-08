@@ -281,6 +281,7 @@ void init_data()
 				global.partile_particle_screening_length = 4.0;
 		}
 	} else {
+        global.N_particles = 1000;
 		global.particle_driving_force = 0.2;
 		global.partile_particle_screening_length = 4.0;
 	}
@@ -365,6 +366,7 @@ void init_data()
     global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
     snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
 
+        printf("%s\n", toTest);
     if (fileExists(global.moviefile_name) || fileExists(global.statisticsfile_name)) {
         snprintf(&toTest[strlen(toTest)], 16, "_%s", buff);
 
@@ -377,7 +379,7 @@ void init_data()
         snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
     }
 
-    free(toTest);
+    // free(toTest);
 
     printf("File names:\n");
 	printf("\tMoviefile: %s\n", global.moviefile_name);
@@ -427,6 +429,7 @@ void init_pinningsites()
     global.pinningsite_direction_y = (double *) malloc(global.N_pinningsites * sizeof(double));
     global.pinningsite_dx_so_far = (double *) malloc(global.N_pinningsites * sizeof(double));
     global.pinningsite_dy_so_far = (double *) malloc(global.N_pinningsites * sizeof(double));
+    global.particle_in_pinningsite = (unsigned int *) malloc(global.N_pinningsites * sizeof(unsigned int));
 
     //init_pinningsites_square_lattice();
     init_pinningsites_triangular_lattice();
@@ -496,6 +499,7 @@ void init_pinningsites_triangular_lattice()
             global.pinningsite_dy_so_far[k] = 0.0;
             global.pinningsite_fx[k] = 0.0;
             global.pinningsite_fy[k] = 0.0;
+            global.particle_in_pinningsite[k] = 0;
             
             //set the color and direction of the pinningsite
             
@@ -796,6 +800,7 @@ void init_files()
         COLOR_DEFAULT;
         exit(2);
     }
+    fprintf(global.statisticsfile, "time dx dy avg_particles_per_pinningsite\n");
 }
 
 char* substr(const char* from, int start, int count)

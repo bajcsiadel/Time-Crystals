@@ -52,10 +52,8 @@ void run_simulation()
         }
 
         //statistics time
-        if ((global.time % global.statistics_time == 0)&&(global.time!=0))
-        {
+        if (global.time % global.statistics_time == 0 && global.time!=0)
             write_statistics();
-        }
 
         //movie write time
         if (global.time % global.movie_time == 0)
@@ -282,6 +280,7 @@ void calculate_pinning_force_on_particles()
                     {
                         global.particle_fx[i] += dx / r * global.pinningsite_force;
                         global.particle_fy[i] += dy / r * global.pinningsite_force;
+                        global.particle_in_pinningsite[k] ++;
                     }
                     j ++;
                 }
@@ -384,6 +383,7 @@ void rebuild_Verlet_list()
         global.particle_dx_so_far[i] = 0.0;
         global.particle_dy_so_far[i] = 0.0;
     }
+    // test_program_by_coloring();
 }
 
 void rebuild_pinning_grid()
@@ -442,7 +442,6 @@ void rebuild_pinning_grid()
             global.pinningsite_grid[gi][gj][k] = i;
         }
     }
-    test_program_by_coloring();
 }
 
 
@@ -563,7 +562,6 @@ void write_cmovie_frame()
         floatholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
         fwrite(&floatholder, sizeof(float), 1, global.moviefile);
     }
-
 }
 
 void calculate_statistics()
@@ -575,15 +573,24 @@ void write_statistics()
     int j;
 
     fprintf(global.statisticsfile, "%d ", global.time);
-    double dx, dy;
+    double dx, dy, avg_particle_per_pinningsite;
 
     dx = dy = 0.0;
     for (j = 0; j < global.N_particles; j++) {
         dx += global.particle_all_dx[j];
         dy += global.particle_all_dy[j];
     }
+
+    avg_particle_per_pinningsite = 0.0;
+    for (j = 0; j < global.N_pinningsites; j++)
+    {
+        avg_particle_per_pinningsite += global.particle_in_pinningsite[j];
+        global.particle_in_pinningsite[j] = 0;
+    }
+
     fprintf(global.statisticsfile, "%lf ", dx / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", dy / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", avg_particle_per_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "\n");
     fflush(global.statisticsfile);
 
@@ -600,7 +607,6 @@ void test_program_by_coloring()
     int i, j, k;
 
     //testing the Verlet list by coloring one particle's neightbors one color
-    /*
     for(i=0;i<global.N_particles;i++)
         global.particle_color[i] = 2;
 
@@ -608,25 +614,24 @@ void test_program_by_coloring()
         {
         i = global.Verletlisti[ii];
         j = global.Verletlistj[ii];
-        if (i==150) global.particle_color[j] = 3;
-        if (j==150) global.particle_color[i] = 3;
+        if (i==150) global.particle_color[j] = 0;
+        if (j==150) global.particle_color[i] = 0;
         }
     //printf("\n");
-    */
 
     //testing the pinning grid by coloring the pins
-    for(i = 0; i < global.Nx_pinningsite_grid; i++)
-        for(j = 0; j < global.Ny_pinningsite_grid; j++)
-            for (k = 0; k < global.max_pinningsite_per_grid; k++)
-                if (global.pinningsite_grid[i][j][k] == -1)
-                    break;
-                else
-                {
-                    int d = global.pinningsite_grid[i][j][k];
-                    global.pinningsite_color[d] = (i + j) % 2 + 4;
-                    // if (d < 24)
-                    //     printf("%d: (%lf, %lf) -> (%d, %d) -> %d\n", d, global.pinningsite_x[d], global.pinningsite_y[d], i, j, global.pinningsite_color[d]);
-                }
+    // for(i = 0; i < global.Nx_pinningsite_grid; i++)
+    //     for(j = 0; j < global.Ny_pinningsite_grid; j++)
+    //         for (k = 0; k < global.max_pinningsite_per_grid; k++)
+    //             if (global.pinningsite_grid[i][j][k] == -1)
+    //                 break;
+    //             else
+    //             {
+    //                 int d = global.pinningsite_grid[i][j][k];
+    //                 global.pinningsite_color[d] = (i + j) % 2 + 4;
+    //                 // if (d < 24)
+    //                 //     printf("%d: (%lf, %lf) -> (%d, %d) -> %d\n", d, global.pinningsite_x[d], global.pinningsite_y[d], i, j, global.pinningsite_color[d]);
+    //             }
 }
 
 void write_time()
@@ -672,6 +677,7 @@ void delete_arrays()
     free(global.pinningsite_direction_y);
     free(global.pinningsite_dx_so_far);
     free(global.pinningsite_dy_so_far);
+    free(global.particle_in_pinningsite);
     
     free(global.particle_x);
     free(global.particle_y);
