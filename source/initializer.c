@@ -18,6 +18,8 @@
 #include "globaldata.h"
 #include "color.h"
 
+
+// http://www.codebind.com/cpp-tutorial/c-get-current-directory-linuxwindows/
 #ifdef WINDOWS
     #include <direct.h>
     #include <windows.h>
@@ -46,9 +48,9 @@
 #endif
 
 void getCurrentWorkingDir(char *current_working_dir) {
-  char buff[FILENAME_MAX];
-  GetCurrentDir( buff, FILENAME_MAX );
-  memcpy(current_working_dir, buff, strlen(buff));
+    char buff[FILENAME_MAX];
+    GetCurrentDir(buff, FILENAME_MAX);
+    memcpy(current_working_dir, buff, strlen(buff));
 }
 
 void getPathToResultFolder(char *path, size_t path_size) {
@@ -63,11 +65,11 @@ void getPathToResultFolder(char *path, size_t path_size) {
     
     for (; *time_crystals != '\0'; time_crystals++) {
         if (*time_crystals == '\\' || *time_crystals == '/') {
-            buff += snprintf(buff, end - buff, "%s../", buff);
+            buff += snprintf(buff, end - buff, "../");
         }
     }
     
-    snprintf(buff, end - buff, "%sresults/", buff);
+    snprintf(buff, end - buff, "results/");
     free(current_working_dir);
 }
 
