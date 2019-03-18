@@ -14,7 +14,7 @@
 #include "jsmn.h"
 
 struct global_struct
-    {
+{
     double SX, SY;
     double halfSX,halfSY;
     
@@ -88,15 +88,13 @@ struct global_struct
 
     time_t start_time;
     time_t end_time;
-    };
+};
 
 struct flag_struct
-    {
+{
     short int system_size_SX_set;
     short int system_size_SY_set;
-
-    
-    };
+};
 
 
 

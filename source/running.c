@@ -254,6 +254,7 @@ void calculate_pinning_force_on_particles()
     r = global.pinningsite_R;
     for (i = 0; i < global.N_particles; i++)
     {
+        // getting particle's position
         x = global.particle_x[i];
         y = global.particle_y[i];
 
@@ -383,7 +384,6 @@ void rebuild_Verlet_list()
         global.particle_dx_so_far[i] = 0.0;
         global.particle_dy_so_far[i] = 0.0;
     }
-    // test_program_by_coloring();
 }
 
 void rebuild_pinning_grid()
@@ -524,7 +524,7 @@ void write_cmovie_frame()
     int intholder;
 
     //implement the color testing
-    // test_program_by_coloring();
+    test_program_by_coloring();
 
     //legacy cmovie format for del-plot
 
@@ -574,6 +574,7 @@ void write_statistics()
 
     fprintf(global.statisticsfile, "%d ", global.time);
     double dx, dy, avg_particle_per_pinningsite;
+    double avg_particle_per_horizontal_pinningsite, avg_particle_per_left_up_pinningsite, avg_particle_per_left_down_pinningsite;
 
     dx = dy = 0.0;
     for (j = 0; j < global.N_particles; j++) {
@@ -582,14 +583,24 @@ void write_statistics()
     }
 
     avg_particle_per_pinningsite = 0.0;
+    avg_particle_per_horizontal_pinningsite = 0.0;
+    avg_particle_per_left_up_pinningsite = 0.0;
+    avg_particle_per_left_down_pinningsite = 0.0;
     for (j = 0; j < global.N_pinningsites; j++)
     {
-        avg_particle_per_pinningsite += global.particle_in_pinningsite[j];
+        unsigned int par_per_pin = global.particle_in_pinningsite[j];
+        avg_particle_per_pinningsite += par_per_pin;
+        if (global.pinningsite_direction_x[j] == 1.0 && global.pinningsite_direction_y[j] == 0.0) avg_particle_per_horizontal_pinningsite += par_per_pin;
+        else if (global.pinningsite_direction_x[j] == -0.5 && global.pinningsite_direction_y[j] == -sqrt(3) / 2) avg_particle_per_left_down_pinningsite += par_per_pin;
+        else if (global.pinningsite_direction_x[j] == -0.5 && global.pinningsite_direction_y[j] == +sqrt(3) / 2) avg_particle_per_left_up_pinningsite += par_per_pin;
         global.particle_in_pinningsite[j] = 0;
     }
 
     fprintf(global.statisticsfile, "%lf ", dx / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", dy / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", avg_particle_per_horizontal_pinningsite / global.N_pinningsites / global.statistics_time);
+    fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_down_pinningsite / global.N_pinningsites / global.statistics_time);
+    fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_up_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "\n");
     fflush(global.statisticsfile);

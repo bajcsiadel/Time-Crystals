@@ -188,7 +188,7 @@ void init_data()
         COLOR_DEFAULT;
 		return;
 	} else {
-		global.t = (jsmntok_t*) malloc(sizeof(jsmntok_t) * n);
+		global.t = (jsmntok_t*) malloc(n * sizeof(jsmntok_t));
 	}
 	jsmn_init(&p);
 	r = jsmn_parse(&p, global.JSON, len, global.t, n);
@@ -802,7 +802,7 @@ void init_files()
         COLOR_DEFAULT;
         exit(2);
     }
-    fprintf(global.statisticsfile, "time dx dy avg_particles_per_pinningsite\n");
+    fprintf(global.statisticsfile, "time dx dy avg_particle_per_horizontal_pinningsite avg_particle_per_left_down_pinningsite avg_particle_per_left_up_pinningsite avg_particles_per_pinningsite\n");
 }
 
 char* substr(const char* from, int start, int count)

@@ -5,7 +5,7 @@ HEADERS = globaldata.h initializer.h running.h jsmn.h
 OUT_DIR = ../build
 RESULT_DIRS = ../results/movies ../results/outs ../results/stats ../results/graphs
 
-all: clean bin softsim
+all: clean bin $(EXE)
 
 .PHONY: bin
 
