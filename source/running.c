@@ -604,7 +604,6 @@ void write_statistics()
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "\n");
     fflush(global.statisticsfile);
-
 }
 
 

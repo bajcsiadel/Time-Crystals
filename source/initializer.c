@@ -6,13 +6,13 @@
 //  Copyright © 2018 András Libál. All rights reserved.
 //
 
-#include <math.h>
+#include <math.h>   // sqrt
 #include <regex.h>
-#include <string.h>
+#include <string.h> // strlen, srtstr, strncpy, strncat, strncmp, strchr
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <time.h>
+#include <ctype.h>  // isspace
+#include <time.h>   // time
 
 #include "initializer.h"
 #include "globaldata.h"
@@ -71,6 +71,18 @@ void getPathToResultFolder(char *path, size_t path_size) {
     
     snprintf(buff, end - buff, "results/");
     free(current_working_dir);
+}
+
+void set_seed(const char *seed)
+{
+    unsigned int s;
+    if (seed)
+        s = atoi(seed);
+    else
+        s = time(NULL);
+
+    srand(s);
+    printf("Seed value: %u\n", s);
 }
 
 //reads the parameter file

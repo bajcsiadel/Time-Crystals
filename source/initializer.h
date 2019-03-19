@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void set_seed(const char*);
 int read_init_file(const char*);
 int check_file_name(const char*, char*);
 int get_token(int, int, const char*);
