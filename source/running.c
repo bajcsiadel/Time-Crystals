@@ -28,12 +28,12 @@ void run_simulation()
         //rotate_pinningsite_directions();
         calculate_external_forces_on_pinningsites();
         move_pinningsites();
-        // rebuild_pinning_grid();
+        rebuild_pinning_grid();
         
         // calculate_external_forces_on_particles();
         calculate_pairwise_forces();
-        // calculate_pinning_force_on_particles();
-        calclulate_pinning_force_on_particles_without_grid();
+        calculate_pinning_force_on_particles();
+        // calclulate_pinning_force_on_particles_without_grid();
 
         //this is where we calculate statistics
         calculate_statistics();
@@ -560,86 +560,7 @@ void write_cmovie_frame()
 
     //legacy cmovie format for del-plot
 
-    // intholder = global.N_pinningsites + global.N_particles;
-    // fwrite(&intholder, sizeof(int), 1, global.moviefile);
-
-    // intholder = global.time;
-    // fwrite(&intholder, sizeof(int), 1, global.moviefile);
-
-    // for (i = 0; i < global.N_pinningsites; i++)
-    // {
-    //     intholder = global.pinningsite_color[i];
-    //     fwrite(&intholder, sizeof(int), 1, global.moviefile);
-    //     intholder = i;//ID
-    //     fwrite(&intholder, sizeof(int), 1, global.moviefile);
-    //     floatholder = (float)global.pinningsite_x[i];
-    //     fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-    //     floatholder = (float)global.pinningsite_y[i];
-    //     fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-    //     floatholder = global.pinningsite_R;//cum_disp, cmovie format
-    //     fwrite(&floatholder, sizeof(float), 1, global.moviefile);
-    // }
-
-
-    // for (i = 0; i < global.N_particles; i++)
-    // {
-    //     intholder = global.particle_color[i];
-    //     fwrite(&intholder, sizeof(int), 1, global.moviefile);
-    //     intholder = i;//ID
-    //     fwrite(&intholder, sizeof(int), 1, global.moviefile);
-    //     floatholder = (float)global.particle_x[i];
-    //     fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-    //     floatholder = (float)global.particle_y[i];
-    //     fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-    //     floatholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
-    //     fwrite(&floatholder, sizeof(float), 1, global.moviefile);
-    // }
-
-    float dr2, dx, dy;
-    float r, x, y;
-    int i, j, gi, gj, gj2, n, m, k, count;
-
-    r = global.pinningsite_R;
-
-    x = global.particle_x[50];
-    y = global.particle_y[50];
-
-    count = 1;
-
-    gi = (int) (x / global.pinningsite_grid_dx) - 1;
-    gj = (int) (y / global.pinningsite_grid_dy) - 1;
-
-    for (m = 0; m < 3; m++)
-    {
-        if (gi == -1) gi = global.Nx_pinningsite_grid - 1;
-        else if (gi == global.Nx_pinningsite_grid - 1) gi = 0;
-        else gi ++;
-
-        gj2 = gj;
-        for (n = 0; n < 3; n++)
-        {
-            if (gj2 == -1) gj2 = global.Ny_pinningsite_grid - 1;
-            else if (gj2 == global.Ny_pinningsite_grid - 1) gj2 = 0;
-            else gj2 ++;
-
-            j = 0;
-            while (j < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj2][j] != -1)
-            {
-                k = global.pinningsite_grid[gi][gj2][j];
-                count ++;
-                distance_squared_folded_PBC(x, y, global.pinningsite_x[k], global.pinningsite_y[k], &dr2, &dx, &dy);
-                if (dr2 < r * r)
-                {
-                    global.particle_fx[i] += dx / r * global.pinningsite_force;
-                    global.particle_fy[i] += dy / r * global.pinningsite_force;
-                    global.particle_in_pinningsite[k] ++;
-                }
-                j ++;
-            }
-        }
-    }
-
-    intholder = count;
+    intholder = global.N_pinningsites + global.N_particles;
     fwrite(&intholder, sizeof(int), 1, global.moviefile);
 
     intholder = global.time;
