@@ -249,8 +249,8 @@ void calculate_pinning_force_on_particles()
 {
     unsigned int i, j, k, n, m;
     int gi, gj, gj2;
-    float dr2, dx, dy;
-    float r, x, y;
+    double dr2, dx, dy;
+    double r, x, y;
 
     r = global.pinningsite_R;
     for (i = 0; i < global.N_particles; i++)
