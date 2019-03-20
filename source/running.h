@@ -22,6 +22,7 @@ void rebuild_pinning_grid(void);
 void calculate_external_forces_on_particles(void);
 void calculate_pairwise_forces(void);
 void calculate_pinning_force_on_particles(void);
+void calclulate_pinning_force_on_particles_without_grid(void);
 void check_Verlet_rebuild_condition_and_set_flag(void);
 void rebuild_Verlet_list(void);
 void move_particles(void);
