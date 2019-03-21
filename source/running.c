@@ -263,8 +263,13 @@ void calculate_pinning_force_on_particles()
         x = global.particle_x[i];
         y = global.particle_y[i];
 
-        gi = (int) (x / global.pinningsite_grid_dx) - 1;
-        gj = (int) (y / global.pinningsite_grid_dy) - 1;
+        gi = (int) (x / global.pinningsite_grid_dx);
+        gj = (int) (y / global.pinningsite_grid_dy);
+
+        if (global.time % global.echo_time == 0) {
+            if (i == 150) printf("%f\t%f\n", x, y);
+            if (i == 150) printf("%d\t%d\n", gi, gj);
+        }
 
         for (m = 0; m < 3; m++)
         {
@@ -427,7 +432,6 @@ void rebuild_pinning_grid()
 {
     unsigned int i, j, k;
     unsigned int gi, gj;
-    int max = -1;
 
     if (global.pinningsite_grid == NULL)
     {
@@ -480,9 +484,7 @@ void rebuild_pinning_grid()
         } else {
             global.pinningsite_grid[gi][gj][k] = i;
         }
-        max = (max < k ? k : max);
     }
-    // printf("%d\n", max);
 }
 
 
