@@ -279,6 +279,8 @@ void calculate_pinning_force_on_particles()
                 while (j < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj2][j] != -1)
                 {
                     k = global.pinningsite_grid[gi][gj2][j];
+                    if (i = 150) global.pinningsite_color[k] = 0;
+                    else global.pinningsite_color[k] = 2;
                     distance_squared_folded_PBC(x, y, global.pinningsite_x[k], global.pinningsite_y[k], &dr2, &dx, &dy);
                     if (dr2 < r * r)
                     {
