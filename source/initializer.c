@@ -361,14 +361,14 @@ void init_data()
             if (dot != NULL) *dot = '\0';
         }
 		if (!check_file_name(regex_str, toTest)) {
-            snprintf(toTest, 17, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+            snprintf(toTest, 30, "%s_result_%d%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
         } else {
             strncat(global.moviefile_name, toTest, strlen(toTest) + 1);
         }
 		free(regex_str);
 	} else {
-        toTest = (char *) malloc(17);
-        snprintf(toTest, 17, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+        toTest = (char *) malloc(30);
+        snprintf(toTest, 30, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
         toTest[6] = '\0';
     }
 
@@ -382,6 +382,8 @@ void init_data()
 
         printf("%s\n", toTest);
     if (fileExists(global.moviefile_name) || fileExists(global.statisticsfile_name)) {
+        len = snprintf(NULL, 0, "%s_%s", toTest, buff);
+        toTest = (char *) realloc(toTest, len + 1);
         snprintf(&toTest[strlen(toTest)], 16, "_%s", buff);
 
         len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
@@ -393,7 +395,7 @@ void init_data()
         snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
     }
 
-    // free(toTest);
+    free(toTest);
 
     printf("File names:\n");
 	printf("\tMoviefile: %s\n", global.moviefile_name);

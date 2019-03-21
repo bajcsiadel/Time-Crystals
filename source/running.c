@@ -252,6 +252,10 @@ void calculate_pinning_force_on_particles()
     double dr2, dx, dy;
     double r, x, y;
 
+    for (i = 0; i < global.N_pinningsites; i++)
+        global.particle_color[i] = global.pinningsite_color[i] = 2;
+    global.particle_color[150] = 0;
+
     r = global.pinningsite_R;
     for (i = 0; i < global.N_particles; i++)
     {
@@ -279,8 +283,7 @@ void calculate_pinning_force_on_particles()
                 while (j < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj2][j] != -1)
                 {
                     k = global.pinningsite_grid[gi][gj2][j];
-                    if (i = 150) global.pinningsite_color[k] = 0;
-                    else global.pinningsite_color[k] = 2;
+                    if (i == 150) global.pinningsite_color[k] = 0;
                     distance_squared_folded_PBC(x, y, global.pinningsite_x[k], global.pinningsite_y[k], &dr2, &dx, &dy);
                     if (dr2 < r * r)
                     {
@@ -424,6 +427,7 @@ void rebuild_pinning_grid()
 {
     unsigned int i, j, k;
     unsigned int gi, gj;
+    int max = -1;
 
     if (global.pinningsite_grid == NULL)
     {
@@ -458,6 +462,7 @@ void rebuild_pinning_grid()
     {
         gi = (unsigned int) (global.pinningsite_x[i] / global.pinningsite_grid_dx);
         gj = (unsigned int) (global.pinningsite_y[i] / global.pinningsite_grid_dy);
+        // printf("(%u, %u)\n", gi, gj);
         
         /*if ((gi>=global.Nx_pinningsite_grid)||(gj>=global.Ny_pinningsite_grid))
             {
@@ -475,7 +480,9 @@ void rebuild_pinning_grid()
         } else {
             global.pinningsite_grid[gi][gj][k] = i;
         }
+        max = (max < k ? k : max);
     }
+    // printf("%d\n", max);
 }
 
 
