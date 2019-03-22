@@ -252,43 +252,42 @@ void calculate_pinning_force_on_particles()
     double dr2, dx, dy;
     double r, x, y;
 
-    for (i = 0; i < global.N_pinningsites; i++)
-        global.particle_color[i] = global.pinningsite_color[i] = 2;
-    global.particle_color[150] = 0;
-
     r = global.pinningsite_R;
     for (i = 0; i < global.N_particles; i++)
     {
-        // getting particle's position
+        // getting current particle position
         x = global.particle_x[i];
         y = global.particle_y[i];
 
-        gi = (int) (x / global.pinningsite_grid_dx);
-        gj = (int) (y / global.pinningsite_grid_dy);
+        // we have to check for each particle the surrounding squares in the grid, because in those could
+        // be pinnningsites close enough to effect it
 
-        if (global.time % global.echo_time == 0) {
-            if (i == 150) printf("%f\t%f\n", x, y);
-            if (i == 150) printf("%d\t%d\n", gi, gj);
-        }
+        // that's why we subtract the particle's position by one, to start with the left upper square the
+        // iteration. Because this subtraction we can get -1 if the particle is in the first row or column
+        // therefore gi and gj have to be int.
+        gi = (int) (x / global.pinningsite_grid_dx) - 1;
+        gj = (int) (y / global.pinningsite_grid_dy) - 1;
 
         for (m = 0; m < 3; m++)
         {
             if (gi == -1) gi = global.Nx_pinningsite_grid - 1;
             else if (gi == global.Nx_pinningsite_grid - 1) gi = 0;
-            else gi ++;
+            else if (m != 0) gi ++;
 
             gj2 = gj;
             for (n = 0; n < 3; n++)
             {
                 if (gj2 == -1) gj2 = global.Ny_pinningsite_grid - 1;
                 else if (gj2 == global.Ny_pinningsite_grid - 1) gj2 = 0;
-                else gj2 ++;
+                else if (n != 0) gj2 ++;
 
                 j = 0;
+                // iterating through pinningsites in the current grid square
                 while (j < global.max_pinningsite_per_grid && global.pinningsite_grid[gi][gj2][j] != -1)
                 {
+                    // getting pinningsite ID
                     k = global.pinningsite_grid[gi][gj2][j];
-                    if (i == 150) global.pinningsite_color[k] = 0;
+                    // calculating distance between pinningsite center and particel
                     distance_squared_folded_PBC(x, y, global.pinningsite_x[k], global.pinningsite_y[k], &dr2, &dx, &dy);
                     if (dr2 < r * r)
                     {
@@ -440,7 +439,7 @@ void rebuild_pinning_grid()
         global.Ny_pinningsite_grid = (int) (global.SY / (2 * global.pinningsite_R)) + 1;
         // global.Nx_pinningsite_grid = 3;
         // global.Ny_pinningsite_grid = 3;
-        global.max_pinningsite_per_grid = 500;
+        global.max_pinningsite_per_grid = 5;
         printf("Pinning sites grid is %d x %d\n", global.Nx_pinningsite_grid, global.Ny_pinningsite_grid);
         global.pinningsite_grid_dx = global.SX / global.Nx_pinningsite_grid;
         global.pinningsite_grid_dy = global.SY / global.Ny_pinningsite_grid;
@@ -563,7 +562,7 @@ void fold_particle_back_PBC(int i)
 void write_cmovie_frame()
 {
     int i;
-    float floatholder;
+    double doubleholder;
     int intholder;
 
     //implement the color testing
@@ -583,12 +582,12 @@ void write_cmovie_frame()
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
         intholder = i;//ID
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
-        floatholder = (float)global.pinningsite_x[i];
-        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-        floatholder = (float)global.pinningsite_y[i];
-        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-        floatholder = global.pinningsite_R;//cum_disp, cmovie format
-        fwrite(&floatholder, sizeof(float), 1, global.moviefile);
+        doubleholder = (double)global.pinningsite_x[i];
+        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
+        doubleholder = (double)global.pinningsite_y[i];
+        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
+        doubleholder = global.pinningsite_R;//cum_disp, cmovie format
+        fwrite(&doubleholder, sizeof(double), 1, global.moviefile);
     }
 
 
@@ -598,12 +597,12 @@ void write_cmovie_frame()
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
         intholder = i;//ID
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
-        floatholder = (float)global.particle_x[i];
-        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-        floatholder = (float)global.particle_y[i];
-        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
-        floatholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
-        fwrite(&floatholder, sizeof(float), 1, global.moviefile);
+        doubleholder = (double)global.particle_x[i];
+        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
+        doubleholder = (double)global.particle_y[i];
+        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
+        doubleholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
+        fwrite(&doubleholder, sizeof(double), 1, global.moviefile);
     }
 }
 

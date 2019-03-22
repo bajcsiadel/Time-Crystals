@@ -23,8 +23,8 @@
 #ifdef WINDOWS
     #include <direct.h>
     #include <windows.h>
-    #define GetCurrentDir _getcwd
-    int fileExists(const char *filename)
+    #define get_current_dir _getcwd
+    int file_exists(const char *filename)
     {
         WIN32_FIND_DATA FindFileData;
         HANDLE handle = FindFirstFile(filename, &FindFileData) ;
@@ -37,8 +37,8 @@
     }
 #else   // LINUX or MAC
     #include <unistd.h>
-    #define GetCurrentDir getcwd
-    int fileExists(const char *filename)
+    #define get_current_dir getcwd
+    int file_exists(const char *filename)
     {
         if (access(filename, F_OK) != -1)
             return 1;
@@ -47,17 +47,17 @@
     }
 #endif
 
-void getCurrentWorkingDir(char *current_working_dir) {
+void get_current_woring_dir(char *current_working_dir) {
     char buff[FILENAME_MAX];
-    GetCurrentDir(buff, FILENAME_MAX);
+    get_current_dir(buff, FILENAME_MAX);
     memcpy(current_working_dir, buff, strlen(buff));
 }
 
-void getPathToResultFolder(char *path, size_t path_size) {
+void get_path_to_result_folder(char *path, size_t path_size) {
     char *current_working_dir, *time_crystals;
 
     current_working_dir = (char *) malloc(255);
-    getCurrentWorkingDir(current_working_dir);
+    get_current_woring_dir(current_working_dir);
     time_crystals = strstr(current_working_dir, "Time-Crystals");
     strncpy(path, "", 1);
     char *buff, *const end = path + path_size;
@@ -137,7 +137,7 @@ int read_init_file(const char* filename)
     return n;
 }
 
-int check_file_name(const char* regex_str, char* toTest)
+int check_file_name(const char* regex_str, char* to_test)
 {
 	regex_t regexCompiled;
 	int result;
@@ -151,7 +151,7 @@ int check_file_name(const char* regex_str, char* toTest)
 		return 0;
 	}
 
-	result = !regexec(&regexCompiled, toTest, 1, pmatch, 0) ? ((pmatch[0].rm_so == 0) && (pmatch[0].rm_eo == strlen(toTest))) : 0;
+	result = !regexec(&regexCompiled, to_test, 1, pmatch, 0) ? ((pmatch[0].rm_so == 0) && (pmatch[0].rm_eo == strlen(to_test))) : 0;
 	regfree(&regexCompiled);
 	return result;
 }
@@ -186,7 +186,7 @@ void init_data()
     jsmn_parser p;
 	int n, r, x, y, object_end;
 	size_t len, regex_len, s, len_file_path;
-	char* regex_str, *toTest, *path, *dot;
+	char* regex_str, *to_test, *path, *dot;
 
 	regex_len = 36;
     len_file_path = 50;
@@ -341,7 +341,7 @@ void init_data()
     printf("Total running time: %d\n", global.total_time);
 
     path = (char *) malloc(255);
-    getPathToResultFolder(path, 255);
+    get_path_to_result_folder(path, 255);
 
     global.moviefile_name = (char *) malloc(len_file_path);
     snprintf(global.moviefile_name, len_file_path, "%smovies/",  path);
@@ -355,47 +355,47 @@ void init_data()
 		regex_str = (char*) malloc(regex_len);
 		strncpy(regex_str, "^[a-z0-9A-Z_]+$", (size_t) 15);
         regex_str[15] = '\0';
-        toTest = substr(global.JSON, global.t[x + 1].start, global.t[x + 1].end - global.t[x + 1].start);
-		if (!check_file_name(regex_str, toTest)) {
-            dot = strchr(toTest, '.');
+        to_test = substr(global.JSON, global.t[x + 1].start, global.t[x + 1].end - global.t[x + 1].start);
+		if (!check_file_name(regex_str, to_test)) {
+            dot = strchr(to_test, '.');
             if (dot != NULL) *dot = '\0';
         }
-		if (!check_file_name(regex_str, toTest)) {
-            snprintf(toTest, 30, "%s_result_%d%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+		if (!check_file_name(regex_str, to_test)) {
+            snprintf(to_test, 30, "%s_result_%d%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
         } else {
-            strncat(global.moviefile_name, toTest, strlen(toTest) + 1);
+            strncat(global.moviefile_name, to_test, strlen(to_test) + 1);
         }
 		free(regex_str);
 	} else {
-        toTest = (char *) malloc(30);
-        snprintf(toTest, 30, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
-        toTest[6] = '\0';
+        to_test = (char *) malloc(30);
+        snprintf(to_test, 30, "%s_result_%d_%d", buff, (int) global.pinningsite_force, (int) (global.pinningsite_force - (int) global.pinningsite_force) * 100);
+        to_test[6] = '\0';
     }
 
-    len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
+    len = snprintf(NULL, 0, "%smovies/%s.mvi", path, to_test);
     global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
-    snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, toTest);
+    snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, to_test);
 
-    len = snprintf(NULL, 0, "%sstats/%s.txt", path, toTest);
+    len = snprintf(NULL, 0, "%sstats/%s.txt", path, to_test);
     global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
-    snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
+    snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, to_test);
 
-        printf("%s\n", toTest);
-    if (fileExists(global.moviefile_name) || fileExists(global.statisticsfile_name)) {
-        len = snprintf(NULL, 0, "%s_%s", toTest, buff);
-        toTest = (char *) realloc(toTest, len + 1);
-        snprintf(&toTest[strlen(toTest)], 16, "_%s", buff);
+        printf("%s\n", to_test);
+    if (file_exists(global.moviefile_name) || file_exists(global.statisticsfile_name)) {
+        len = snprintf(NULL, 0, "%s_%s", to_test, buff);
+        to_test = (char *) realloc(to_test, len + 1);
+        snprintf(&to_test[strlen(to_test)], 16, "_%s", buff);
 
-        len = snprintf(NULL, 0, "%smovies/%s.mvi", path, toTest);
+        len = snprintf(NULL, 0, "%smovies/%s.mvi", path, to_test);
         global.moviefile_name = (char *) realloc(global.moviefile_name, len + 1);
-        snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, toTest);
+        snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path, to_test);
 
-        len = snprintf(NULL, 0, "%sstats/%s.txt", path, toTest);
+        len = snprintf(NULL, 0, "%sstats/%s.txt", path, to_test);
         global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
-        snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, toTest);
+        snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, to_test);
     }
 
-    free(toTest);
+    free(to_test);
 
     printf("File names:\n");
 	printf("\tMoviefile: %s\n", global.moviefile_name);
