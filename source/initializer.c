@@ -565,6 +565,7 @@ void init_particles()
     global.particle_dy_so_far = (double *) malloc(global.N_particles * sizeof(double));
     global.particle_all_dx = (double *) malloc(global.N_particles * sizeof(double));
     global.particle_all_dy = (double *) malloc(global.N_particles * sizeof(double));
+    global.particle_all_dr2 = (double *) malloc(global.N_particles * sizeof(double));
 
     //init_particles_square_lattice();
     //init_particles_triangular_lattice();
@@ -651,23 +652,24 @@ void init_particles_randomly()
         
         global.particle_x[i] = x_try;
         global.particle_y[i] = y_try;
-        global.particle_dx_so_far[i] = 0.0;
-        global.particle_dy_so_far[i] = 0.0;
-        global.particle_all_dx[i] = 0.0;
-        global.particle_all_dy[i] = 0.0;
-        global.particle_fx[i] = 0.0;
-        global.particle_fy[i] = 0.0;
+        global.particle_dx_so_far[i] = 0.0f;
+        global.particle_dy_so_far[i] = 0.0f;
+        global.particle_all_dx[i] = 0.0f;
+        global.particle_all_dy[i] = 0.0f;
+        global.particle_all_dr2[i] = 0.0f;
+        global.particle_fx[i] = 0.0f;
+        global.particle_fy[i] = 0.0f;
         
         if (rand() / (RAND_MAX + 1.0) < 0.5)
         {
-            global.particle_direction_x[i] = - 1.0;
-            global.particle_direction_y[i] = 0.0;
+            global.particle_direction_x[i] = - 1.0f;
+            global.particle_direction_y[i] = 0.0f;
             global.particle_color[i] = 2;
         } 
         else
         {
-            global.particle_direction_x[i] = + 1.0;
-            global.particle_direction_y[i] = 0.0;
+            global.particle_direction_x[i] = + 1.0f;
+            global.particle_direction_y[i] = 0.0f;
             global.particle_color[i] = 3;
         }    
     }
@@ -698,6 +700,7 @@ void init_particles_square_lattice()
             global.particle_dy_so_far[k] = 0.0;
             global.particle_all_dx[k] = 0.0;
             global.particle_all_dy[k] = 0.0;
+            global.particle_all_dr2[i] = 0.0f;
             global.particle_fx[k] = 0.0;
             global.particle_fy[k] = 0.0;
             k++;
@@ -743,6 +746,7 @@ void init_particles_triangular_lattice()
             global.particle_dy_so_far[k] = 0.0;
             global.particle_all_dx[k] = 0.0;
             global.particle_all_dy[k] = 0.0;
+            global.particle_all_dr2[i] = 0.0f;
             global.particle_fx[k] = 0.0;
             global.particle_fy[k] = 0.0;
             
@@ -816,7 +820,7 @@ void init_files()
         COLOR_DEFAULT;
         exit(2);
     }
-    fprintf(global.statisticsfile, "time dx dy avg_particle_per_horizontal_pinningsite avg_particle_per_left_down_pinningsite avg_particle_per_left_up_pinningsite avg_particles_per_pinningsite\n");
+    fprintf(global.statisticsfile, "time dx dy dr2 avg_particle_per_horizontal_pinningsite avg_particle_per_left_down_pinningsite avg_particle_per_left_up_pinningsite avg_particles_per_pinningsite\n");
 }
 
 char* substr(const char* from, int start, int count)

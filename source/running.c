@@ -537,8 +537,9 @@ void move_particles()
         global.particle_dx_so_far[i] += dx;
         global.particle_dy_so_far[i] += dy;
 
-        global.particle_all_dx[i] += dx;
-        global.particle_all_dy[i] += dy;
+        global.particle_all_dx[i]  += fabs(dx);
+        global.particle_all_dy[i]  += fabs(dy);
+        global.particle_all_dr2[i] += dx * dx + dy * dy;
         
         fold_particle_back_PBC(i);
         
@@ -615,13 +616,14 @@ void write_statistics()
     int j;
 
     fprintf(global.statisticsfile, "%d ", global.time);
-    double dx, dy, avg_particle_per_pinningsite;
+    double dx, dy, avg_particle_per_pinningsite, dr2;
     double avg_particle_per_horizontal_pinningsite, avg_particle_per_left_up_pinningsite, avg_particle_per_left_down_pinningsite;
 
-    dx = dy = 0.0;
+    dr2 = dx = dy = 0.0;
     for (j = 0; j < global.N_particles; j++) {
-        dx += global.particle_all_dx[j];
-        dy += global.particle_all_dy[j];
+        dx  += global.particle_all_dx[j];
+        dy  += global.particle_all_dy[j];
+        dr2 += global.particle_all_dr2[j]; 
     }
 
     avg_particle_per_pinningsite = 0.0;
@@ -638,8 +640,9 @@ void write_statistics()
         global.particle_in_pinningsite[j] = 0;
     }
 
-    fprintf(global.statisticsfile, "%lf ", dx / global.N_particles);
-    fprintf(global.statisticsfile, "%lf ", dy / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", dx  / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", dy  / global.N_particles);
+    fprintf(global.statisticsfile, "%lf ", dr2 / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_horizontal_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_down_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_up_pinningsite / global.N_pinningsites / global.statistics_time);

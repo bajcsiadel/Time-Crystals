@@ -48,6 +48,7 @@ struct global_struct
     double *particle_dy_so_far;
     double *particle_all_dx;
     double *particle_all_dy;
+    double *particle_all_dr2;
 
     double particle_driving_force;
     double partile_particle_screening_length;
