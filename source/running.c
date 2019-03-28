@@ -562,7 +562,7 @@ void fold_particle_back_PBC(int i)
 void write_cmovie_frame()
 {
     int i;
-    double doubleholder;
+    float floatholder;
     int intholder;
 
     //implement the color testing
@@ -582,12 +582,12 @@ void write_cmovie_frame()
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
         intholder = i;//ID
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
-        doubleholder = (double)global.pinningsite_x[i];
-        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
-        doubleholder = (double)global.pinningsite_y[i];
-        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
-        doubleholder = global.pinningsite_R;//cum_disp, cmovie format
-        fwrite(&doubleholder, sizeof(double), 1, global.moviefile);
+        floatholder = (float)global.pinningsite_x[i];
+        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
+        floatholder = (float)global.pinningsite_y[i];
+        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
+        floatholder = global.pinningsite_R;//cum_disp, cmovie format
+        fwrite(&floatholder, sizeof(float), 1, global.moviefile);
     }
 
 
@@ -597,12 +597,12 @@ void write_cmovie_frame()
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
         intholder = i;//ID
         fwrite(&intholder, sizeof(int), 1, global.moviefile);
-        doubleholder = (double)global.particle_x[i];
-        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
-        doubleholder = (double)global.particle_y[i];
-        fwrite(&doubleholder, sizeof(double), 1,  global.moviefile);
-        doubleholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
-        fwrite(&doubleholder, sizeof(double), 1, global.moviefile);
+        floatholder = (float)global.particle_x[i];
+        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
+        floatholder = (float)global.particle_y[i];
+        fwrite(&floatholder, sizeof(float), 1,  global.moviefile);
+        floatholder = global.pinningsite_R / 3.0;//cum_disp, cmovie format
+        fwrite(&floatholder, sizeof(float), 1, global.moviefile);
     }
 }
 
