@@ -537,8 +537,10 @@ void move_particles()
         global.particle_dx_so_far[i] += dx;
         global.particle_dy_so_far[i] += dy;
 
-        global.particle_all_dx[i]  += fabs(dx);
-        global.particle_all_dy[i]  += fabs(dy);
+        // global.particle_all_dx[i]  += fabs(dx);
+        // global.particle_all_dy[i]  += fabs(dy);
+        global.particle_all_dx[i]  += dx * dx;
+        global.particle_all_dy[i]  += dy * dy;
         global.particle_all_dr2[i] += dx * dx + dy * dy;
         
         fold_particle_back_PBC(i);
@@ -590,7 +592,6 @@ void write_cmovie_frame()
         floatholder = global.pinningsite_R;//cum_disp, cmovie format
         fwrite(&floatholder, sizeof(float), 1, global.moviefile);
     }
-
 
     for (i = 0; i < global.N_particles; i++)
     {

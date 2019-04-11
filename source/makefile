@@ -4,6 +4,7 @@ HEADERS = globaldata.h initializer.h running.h jsmn.h
 
 OUT_DIR = ../build
 RESULT_DIRS = ../results/movies ../results/outs ../results/stats ../results/graphs
+LIBS = -lm -ljsmn -L../jsmn
 
 all: clean bin $(EXE)
 
@@ -18,7 +19,7 @@ $(RESULT_DIRS):
 	mkdir -p $(RESULT_DIRS)
 
 $(EXE): $(SOURCES) $(HEADERS)
-	gcc $^ -o $(OUT_DIR)/$@ -lm -ljsmn -L../jsmn
+	gcc $^ -o $(OUT_DIR)/$@ $(LIBS)
 
 clean:
 	rm -f $(OUT_DIR)/$(EXE)

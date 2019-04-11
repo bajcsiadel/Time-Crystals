@@ -380,7 +380,6 @@ void init_data()
     global.statisticsfile_name = (char *) realloc(global.statisticsfile_name, len + 1);
     snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path, to_test);
 
-        printf("%s\n", to_test);
     if (file_exists(global.moviefile_name) || file_exists(global.statisticsfile_name)) {
         len = snprintf(NULL, 0, "%s_%s", to_test, buff);
         to_test = (char *) realloc(to_test, len + 1);
