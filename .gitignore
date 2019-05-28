@@ -4,7 +4,7 @@ results
 build
 *test*
 *~
-*.vscode
+**/*.vscode
 *.json
 !config.json
 *.py
