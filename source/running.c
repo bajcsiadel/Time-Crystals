@@ -537,10 +537,10 @@ void move_particles()
         global.particle_dx_so_far[i] += dx;
         global.particle_dy_so_far[i] += dy;
 
-        // global.particle_all_dx[i]  += fabs(dx);
-        // global.particle_all_dy[i]  += fabs(dy);
-        global.particle_all_dx[i]  += dx * dx;
-        global.particle_all_dy[i]  += dy * dy;
+        global.particle_all_dx[i]  += fabs(dx);
+        global.particle_all_dy[i]  += fabs(dy);
+        // global.particle_all_dx[i]  += dx * dx;
+        // global.particle_all_dy[i]  += dy * dy;
         global.particle_all_dr2[i] += dx * dx + dy * dy;
         
         fold_particle_back_PBC(i);
@@ -569,7 +569,7 @@ void write_cmovie_frame()
     int intholder;
 
     //implement the color testing
-    // test_program_by_coloring();
+    test_program_by_coloring();
 
     //legacy cmovie format for del-plot
 
@@ -643,7 +643,7 @@ void write_statistics()
 
     fprintf(global.statisticsfile, "%lf ", dx  / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", dy  / global.N_particles);
-    fprintf(global.statisticsfile, "%lf ", dr2 / global.N_particles);
+    // fprintf(global.statisticsfile, "%lf ", dr2 / global.N_particles);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_horizontal_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_down_pinningsite / global.N_pinningsites / global.statistics_time);
     fprintf(global.statisticsfile, "%lf ", avg_particle_per_left_up_pinningsite / global.N_pinningsites / global.statistics_time);
@@ -663,10 +663,12 @@ void test_program_by_coloring()
     int i, j, k;
 
     //testing the Verlet list by coloring one particle's neightbors one color
-    for(i=0;i<global.N_particles;i++)
+    for(i = 0; i < global.N_particles; i ++)
         global.particle_color[i] = 2;
 
-    for(ii=0;ii<global.N_Verlet;ii++)
+    global.particle_color[150] = 3;
+
+    for(ii = 0; ii < global.N_Verlet; ii ++)
         {
         i = global.Verletlisti[ii];
         j = global.Verletlistj[ii];

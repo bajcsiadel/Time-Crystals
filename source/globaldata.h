@@ -16,43 +16,72 @@
 struct global_struct
 {
     double SX, SY;
-    double halfSX,halfSY;
+    double halfSX, halfSY;
     
-    int N_pinningsites;
-    double *pinningsite_x;
-    double *pinningsite_y;
-    double *pinningsite_fx;
-    double *pinningsite_fy;
-    int *pinningsite_color;
-    double *pinningsite_direction_x;
-    double *pinningsite_direction_y;
-    double *pinningsite_dx_so_far;
-    double *pinningsite_dy_so_far;
-    double pinningsite_R;
-    double pinningsite_force;
+    // number of pinningsites
+    int     N_pinningsites;
+    // x coordinate of pinningsite
+    double  *pinningsite_x;
+    // y coordinate of pinningsite
+    double  *pinningsite_y;
+    // Total force affecting on pinningsite in direction x
+    double  *pinningsite_fx;
+    // Total force affecting on pinningsite in direction y
+    double  *pinningsite_fy;
+    // Color of pinningsite
+    int     *pinningsite_color;
+	// Scale of external force affecting on pinningsite in direction x
+    double  *pinningsite_direction_x;
+	// Scale of external force affecting on pinningsite in direction y
+    double  *pinningsite_direction_y;
+	// Travelled distance in direction x since the Verlet list was rebuilt
+    double  *pinningsite_dx_so_far;
+	// Travelled distance in direction y since the Verlet list was rebuilt
+    double  *pinningsite_dy_so_far;
+    // Radius of pinningsite
+    double  pinningsite_R;
+    // Internal force affecting in pinningsite
+    double  pinningsite_force;
+    // Number of particles in the pinningsite
     unsigned int *particle_in_pinningsite;
     
+    // Pinningsite lattice width
     double pinning_lattice_constant;
+    // External force affecting on pinningsite
     double pinning_driving_force;
     int pinning_direction_change;
     
-    int N_particles;
-    double *particle_x;
-    double *particle_y;
-    double *particle_fx;
-    double *particle_fy;
-    int *particle_color;
-    double *particle_direction_x;
-    double *particle_direction_y;
-    double *particle_dx_so_far;
-    double *particle_dy_so_far;
-    double *particle_all_dx;
-    double *particle_all_dy;
-    double *particle_all_dr2;
+    // number of particles
+    int     N_particles;
+	// x coordinate of particles
+    double  *particle_x;
+	// y coordinate of particles
+    double  *particle_y;
+	// Total force affecting on particle in x direction
+    double  *particle_fx;
+	// Total force affecting on particle in y direction
+    double  *particle_fy;
+	// Color of particle
+    int     *particle_color;
+	// Scale of external force affecting on particle in direction x
+    double  *particle_direction_x;
+	// Scale of external force affecting on particle in direction y
+    double  *particle_direction_y;
+	// Travelled distance in direction x since the Verlet list was rebuilt
+    double  *particle_dx_so_far;
+	// Travelled distance in direction y since the Verlet list was rebuilt
+    double  *particle_dy_so_far;
+	// Travelled distance in the whole simulation in direction x
+    double  *particle_all_dx;
+	// Travelled distance in the whole simulation in direction y
+    double  *particle_all_dy;
+	// Travelled distance in the whole simulation
+    double  *particle_all_dr2;
 
-    double particle_driving_force;
-    double partile_particle_screening_length;
-    double partile_particle_screening_wavevector;
+    // External force affecting on particle
+    double  particle_driving_force;
+    double  partile_particle_screening_length;
+    double  partile_particle_screening_wavevector;
     
     int N_Verlet;
     int N_Verlet_max; //initial allocation + later, longest allocation
