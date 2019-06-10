@@ -22,7 +22,7 @@ static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #        define COLOR_LOG printf("\033[1;97m")
 #    endif
 
-#include <stdio.h>
+#    include <stdio.h>
 
 typedef enum LogTypes
 {
@@ -36,15 +36,15 @@ typedef enum LogTypes
  * 
  * Return value: console length in characters
 */
-int get_console_width();
+int     get_console_width();
 /**
  * Hide cursor from console (it is problematic when drawing the progressbar)
 */
-void hide_cursor();
+void    hide_cursor();
 /**
  * Show cursor on console.
 */
-void show_cursor();
+void    show_cursor();
 
 /**
  * Showing a progressbar in the console.
@@ -53,7 +53,7 @@ void show_cursor();
  * title	- title of the progressbar, optional. Set NULL to skip it.
  * ...		- parameters if title was a format string
 */
-void progress_bar(double, size_t, const char *, ...);
+void    progress_bar(double, size_t, const char *, ...);
 
 /**
  * Printing log to a given file. It contains timestamp, filename and line where the log occured.
@@ -73,8 +73,8 @@ void progress_bar(double, size_t, const char *, ...);
  * 
  * Return value: true, if it managed to print each note, false otherwise
 */
-int print_log(FILE * stream, LogTypes type, const char *filename,
-			  const int line, const char *title, const size_t format_number,
-			  ...);
+int     print_log(FILE * stream, LogTypes type, const char *filename,
+				  const int line, const char *title,
+				  const size_t format_number, ...);
 
 #endif /* utils_h */

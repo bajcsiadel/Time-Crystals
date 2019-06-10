@@ -71,7 +71,8 @@ void progress_bar(double progress, size_t total, const char *title, ...)
 	setlocale(LC_ALL, "");
 	const wchar_t blocks[] =
 		{ ' ', L'\u258F', L'\u258E', L'\u258D', L'\u258C', L'\u258B',
-		 L'\u258A', L'\u2589' };
+		L'\u258A', L'\u2589'
+	};
 	size_t title_len;
 	if (title != NULL)
 	{
