@@ -268,8 +268,7 @@ void init_data()
 			{
 				global.SX = atof(substr(global.JSON, global.t[y + 1].start,
 										global.t[y + 1].end - global.t[y +
-																	   1].
-										start));
+																	   1].start));
 			}
 			else
 			{
@@ -285,8 +284,7 @@ void init_data()
 			{
 				global.SY = atof(substr(global.JSON, global.t[y + 1].start,
 										global.t[y + 1].end - global.t[y +
-																	   1].
-										start));
+																	   1].start));
 			}
 			else
 			{
@@ -545,8 +543,7 @@ void init_data()
 	{
 		global.movie_time = atoi(substr(global.JSON, global.t[x + 1].start,
 										global.t[x + 1].end - global.t[x +
-																	   1].
-										start));
+																	   1].start));
 	}
 	else
 	{
@@ -562,8 +559,7 @@ void init_data()
 	{
 		global.total_time = atoi(substr(global.JSON, global.t[x + 1].start,
 										global.t[x + 1].end - global.t[x +
-																	   1].
-										start));
+																	   1].start));
 	}
 	else
 	{
@@ -579,8 +575,7 @@ void init_data()
 	{
 		global.echo_time = atoi(substr(global.JSON, global.t[x + 1].start,
 									   global.t[x + 1].end - global.t[x +
-																	  1].
-									   start));
+																	  1].start));
 	}
 	else
 	{
@@ -677,28 +672,28 @@ void init_data()
 
 	// if one of the result files already exists then creating a unique filename by adding a timestemp to it
 	/*
-	if (file_exists(global.moviefile_name)
-		|| file_exists(global.statisticsfile_name))
-	{
-		// try to create concatenated string by adding timestamp to the base filename
-		len = snprintf(NULL, 0, "%s_%s", to_test, buff);
-		to_test = (char *) realloc(to_test, len + 1);
-		snprintf(&to_test[strlen(to_test)], 16, "_%s", buff);
+	   if (file_exists(global.moviefile_name)
+	   || file_exists(global.statisticsfile_name))
+	   {
+	   // try to create concatenated string by adding timestamp to the base filename
+	   len = snprintf(NULL, 0, "%s_%s", to_test, buff);
+	   to_test = (char *) realloc(to_test, len + 1);
+	   snprintf(&to_test[strlen(to_test)], 16, "_%s", buff);
 
-		// try to concatenate the whole path with the new filename
-		len = snprintf(NULL, 0, "%smovies/%s.mvi", path, to_test);
-		global.moviefile_name =
-			(char *) realloc(global.moviefile_name, len + 1);
-		snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path,
-				 to_test);
+	   // try to concatenate the whole path with the new filename
+	   len = snprintf(NULL, 0, "%smovies/%s.mvi", path, to_test);
+	   global.moviefile_name =
+	   (char *) realloc(global.moviefile_name, len + 1);
+	   snprintf(global.moviefile_name, len + 1, "%smovies/%s.mvi", path,
+	   to_test);
 
-		// try to concatenate the whole path with the new filename
-		len = snprintf(NULL, 0, "%sstats/%s.txt", path, to_test);
-		global.statisticsfile_name =
-			(char *) realloc(global.statisticsfile_name, len + 1);
-		snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path,
-				 to_test);
-	}*/
+	   // try to concatenate the whole path with the new filename
+	   len = snprintf(NULL, 0, "%sstats/%s.txt", path, to_test);
+	   global.statisticsfile_name =
+	   (char *) realloc(global.statisticsfile_name, len + 1);
+	   snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path,
+	   to_test);
+	   } */
 
 	free(to_test);
 

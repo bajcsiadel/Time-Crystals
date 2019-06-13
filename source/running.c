@@ -61,11 +61,11 @@ void run_simulation()
 
 		// statistics time
 		if (global.time % global.statistics_time == 0 && global.time != 0)
-		 write_statistics();
+			write_statistics();
 
 		// movie write time
 		if (global.time % global.movie_time == 0)
-		 write_cmovie_frame();
+			write_cmovie_frame();
 	}
 
 	delete_arrays();
