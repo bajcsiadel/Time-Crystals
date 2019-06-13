@@ -676,6 +676,7 @@ void init_data()
 			 to_test);
 
 	// if one of the result files already exists then creating a unique filename by adding a timestemp to it
+	/*
 	if (file_exists(global.moviefile_name)
 		|| file_exists(global.statisticsfile_name))
 	{
@@ -697,7 +698,7 @@ void init_data()
 			(char *) realloc(global.statisticsfile_name, len + 1);
 		snprintf(global.statisticsfile_name, len + 1, "%sstats/%s.txt", path,
 				 to_test);
-	}
+	}*/
 
 	free(to_test);
 
