@@ -414,7 +414,7 @@ void rebuild_Verlet_list()
 		density =
 			global.N_particles / (double) global.SX / (double) global.SY;
 
-		estimation *=
+		estimation = density *
 			PI * global.Verlet_cutoff_distance *
 			global.Verlet_cutoff_distance;
 
