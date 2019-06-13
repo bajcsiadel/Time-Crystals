@@ -418,8 +418,8 @@ void rebuild_Verlet_list()
 			PI * global.Verlet_cutoff_distance *
 			global.Verlet_cutoff_distance;
 
-		// estimating number of particla pairs in Verlet list
-		global.N_Verlet_max = (int) estimation * global.N_particles / 2;
+		// estimating number of particle pairs in Verlet list
+		global.N_Verlet_max = (int) estimation * global.N_particles;
 
 		global.Verletlisti =
 			(int *) malloc(global.N_Verlet_max * sizeof(int));
@@ -459,7 +459,7 @@ void rebuild_Verlet_list()
 				{
 					int old = global.N_Verlet_max;
 					// calculate new max size of Verlet list
-					global.N_Verlet_max = (int) (1.1 * global.N_Verlet);
+					global.N_Verlet_max = global.N_Verlet + 10;
 					// reallocate arrays
 					global.Verletlisti = (int *) realloc(global.Verletlisti,
 														 global.N_Verlet_max *
